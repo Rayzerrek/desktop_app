@@ -2,9 +2,10 @@ import { useState } from "react";
 
 interface RegisterFormProps {
   onSubmit: (email: string, password: string, username: string) => void;
+  disabled?: boolean;
 }
 
-export default function RegisterForm({ onSubmit }: RegisterFormProps) {
+export default function RegisterForm({ onSubmit, disabled = false }: RegisterFormProps) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,9 +86,10 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
 
       <button
         type="submit"
-        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md hover:shadow-lg hover:cursor-pointer"
+        disabled={disabled}
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Zarejestruj się
+        {disabled ? "Rejestracja..." : "Zarejestruj się"}
       </button>
     </form>
   );

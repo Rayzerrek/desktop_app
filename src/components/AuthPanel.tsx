@@ -1,16 +1,64 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
+interface AuthResponse {
+  success: boolean;
+  message: string;
+  user_id?: string;
+}
+
 export default function AuthPanel() {
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (email: string, password: string) => {
-    console.log("Logowanie:", { email, password });
+  const handleLogin = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const response = await invoke<AuthResponse>("login_user", {
+        email,
+        password,
+      });
+
+      if (response.success) {
+        alert(`✅ ${response.message}`);
+        console.log("User ID:", response.user_id);
+      } else {
+        alert(`❌ ${response.message}`);
+      }
+    } catch (error) {
+      alert("Błąd podczas logowania: " + error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRegister = (email: string, password: string, username: string) => {
-    console.log("Rejestracja:", { email, password, username });
+  const handleRegister = async (
+    email: string,
+    password: string,
+    username: string
+  ) => {
+    setLoading(true);
+    try {
+      const response = await invoke<AuthResponse>("register_user", {
+        email,
+        password,
+        username,
+      });
+
+      if (response.success) {
+        alert(`✅ ${response.message}`);
+        console.log("User ID:", response.user_id);
+        setIsLogin(true);
+      } else {
+        alert(`❌ ${response.message}`);
+      }
+    } catch (error) {
+      alert("Błąd podczas rejestracji: " + error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,9 +99,9 @@ export default function AuthPanel() {
         </div>
 
         {isLogin ? (
-          <LoginForm onSubmit={handleLogin} />
+          <LoginForm onSubmit={handleLogin} disabled={loading} />
         ) : (
-          <RegisterForm onSubmit={handleRegister} />
+          <RegisterForm onSubmit={handleRegister} disabled={loading} />
         )}
 
         <div className="mt-6 text-center text-sm text-gray-500">

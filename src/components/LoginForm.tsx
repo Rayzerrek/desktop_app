@@ -2,9 +2,10 @@ import { useState } from "react";
 
 interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
+  disabled?: boolean;
 }
 
-export default function LoginForm({ onSubmit }: LoginFormProps) {
+export default function LoginForm({ onSubmit, disabled = false }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -47,9 +48,10 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+        disabled={disabled}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Zaloguj się
+        {disabled ? "Logowanie..." : "Zaloguj się"}
       </button>
     </form>
   );
