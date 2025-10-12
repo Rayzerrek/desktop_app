@@ -4,7 +4,7 @@ interface LessonSuccessModalProps {
    isOpen: boolean;
    onClose: () => void;
    onNextLesson: () => void;
-   xpEarned: number;
+   xpReward: number;
    lessonTitle: string;
 }
 
@@ -12,7 +12,7 @@ export default function LessonSuccessModal({
    isOpen,
    onClose,
    onNextLesson,
-   xpEarned,
+   xpReward,
    lessonTitle,
 }: LessonSuccessModalProps) {
    const [isAnimating, setIsAnimating] = useState(false);
@@ -80,7 +80,7 @@ export default function LessonSuccessModal({
 
                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 mb-6 text-center shadow-lg transform hover:scale-105 transition-transform">
                   <div className="text-white text-5xl font-bold mb-1 animate-pulse">
-                     +{xpEarned} XP
+                     +{xpReward} XP
                   </div>
                   <div className="text-yellow-100 text-sm font-medium">
                      Kontynuuj naukę aby zdobyć więcej!

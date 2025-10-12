@@ -108,6 +108,19 @@ async fn google_sign_in() -> Result<String, String> {
     client.sign_in_with_google().await
 }
 
+#[tauri::command]
+async fn check_is_admin(access_token: String) -> Result<bool, String> {
+    let client = create_supabase_client()?;
+
+    let response = client.get_user_profile_with_role(&access_token).await?;
+
+    if let Some(role) = response.get("role").and_then(|r| r.as_str()) {
+        Ok(role == "admin" || role == "super_admin")
+    } else {
+        Ok(false)
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(debug_assertions)]
@@ -122,7 +135,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             login_user,
             register_user,
-            google_sign_in
+            google_sign_in,
+            check_is_admin
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

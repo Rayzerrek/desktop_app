@@ -156,6 +156,78 @@ impl SupabaseClient {
         Ok(url)
     }
 
+    pub async fn get_user_profile_with_role(
+        &self,
+        access_token: &str,
+    ) -> Result<serde_json::Value, String> {
+        // First get the user ID from the token
+        let url = format!("{}/auth/v1/user", self.url);
+
+        let user_response = self
+            .client
+            .get(&url)
+            .header("apikey", &self.anon_key)
+            .header("Authorization", format!("Bearer {}", access_token))
+            .send()
+            .await
+            .map_err(|e| format!("Network error getting user: {}", e))?;
+
+        if !user_response.status().is_success() {
+            return Err("Failed to get user from token".to_string());
+        }
+
+        let user_data: serde_json::Value = user_response
+            .json()
+            .await
+            .map_err(|e| format!("Failed to parse user: {}", e))?;
+
+        let user_id = user_data
+            .get("id")
+            .and_then(|id| id.as_str())
+            .ok_or("No user ID in response")?;
+
+        println!("📝 User ID from token: {}", user_id);
+
+        // Now get the profile with role
+        let profile_url = format!("{}/rest/v1/profiles?id=eq.{}&select=*", self.url, user_id);
+
+        let profile_response = self
+            .client
+            .get(&profile_url)
+            .header("apikey", &self.anon_key)
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Content-Type", "application/json")
+            .send()
+            .await
+            .map_err(|e| format!("Network error getting profile: {}", e))?;
+
+        println!("📥 Profile response status: {}", profile_response.status());
+
+        if profile_response.status().is_success() {
+            let profile_text = profile_response
+                .text()
+                .await
+                .map_err(|e| format!("Failed to read profile response: {}", e))?;
+
+            println!("📋 Profile data: {}", profile_text);
+
+            let profiles: Vec<serde_json::Value> = serde_json::from_str(&profile_text)
+                .map_err(|e| format!("Failed to parse profile: {}", e))?;
+
+            profiles
+                .first()
+                .cloned()
+                .ok_or("No profile found".to_string())
+        } else {
+            let error_text = profile_response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+            println!("❌ Profile error: {}", error_text);
+            Err(error_text)
+        }
+    }
+
     pub async fn exchange_code_for_session(
         &self,
         code: &str,

@@ -12,7 +12,11 @@ interface AuthResponse {
    refresh_token?: string;
 }
 
-export default function AuthPanel() {
+interface AuthPanelProps {
+   onLoginSuccess?: () => void;
+}
+
+export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
    const [isLogin, setIsLogin] = useState(true);
    const [loading, setLoading] = useState(false);
    const [toast, setToast] = useState<{
@@ -64,6 +68,11 @@ export default function AuthPanel() {
             if (response.user_id) {
                localStorage.setItem("user_id", response.user_id);
             }
+
+            // Navigate to dashboard after successful login
+            setTimeout(() => {
+               onLoginSuccess?.();
+            }, 1000);
          } else {
             setToast({
                message: response.message,
@@ -109,7 +118,15 @@ export default function AuthPanel() {
             if (response.user_id) {
                localStorage.setItem("user_id", response.user_id);
             }
-            setIsLogin(true);
+
+            // Switch to login view or navigate to dashboard
+            setTimeout(() => {
+               if (response.access_token) {
+                  onLoginSuccess?.();
+               } else {
+                  setIsLogin(true);
+               }
+            }, 1000);
          } else {
             setToast({
                message: response.message,
@@ -174,7 +191,11 @@ export default function AuthPanel() {
                {isLogin ? (
                   <LoginForm onSubmit={handleLogin} disabled={loading} />
                ) : (
-                  <RegisterForm onSubmit={handleRegister} disabled={loading} />
+                  <RegisterForm
+                     onSubmit={handleRegister}
+                     onError={(message) => setToast({ message, type: "error" })}
+                     disabled={loading}
+                  />
                )}
 
                <div className="mt-6">

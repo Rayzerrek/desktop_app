@@ -1,23 +1,70 @@
 import { useState } from "react";
 import CodeEditor from "./CodeEditor";
 import LessonSuccessModal from "./LessonSuccessModal";
+import { getLessonById, allCourses } from "../data/sampleLessons";
 
-export default function LessonDemo() {
+interface LessonDemoProps {
+   lessonId?: string;
+   onNextLesson?: (nextLessonId: string) => void;
+   onBackToCourse?: () => void;
+}
+
+export default function LessonDemo({
+   lessonId = "py-001",
+   onNextLesson,
+}: LessonDemoProps) {
    const [output, setOutput] = useState<string>("");
    const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-   const starterCode = `# Napisz kod, który wypisze "Hello World"
-print("Hello World")`;
+   console.log("LessonDemo - Received lessonId:", lessonId);
+   const lesson = getLessonById(lessonId);
+   console.log(
+      "LessonDemo - Found lesson:",
+      lesson?.title,
+      "Language:",
+      lesson?.language,
+   );
 
-   const expectedOutput = "Hello World";
+   if (!lesson) {
+      return <div>Lesson not found</div>;
+   }
+
+   const course = allCourses.find((c) =>
+      c.modules.some((m) => m.lessons.some((l) => l.id === lessonId)),
+   );
+
+   const starterCode =
+      lesson.content.type === "exercise" ? lesson.content.starterCode : "";
+   const expectedOutput =
+      lesson.content.type === "exercise" && lesson.content.testCases?.[0]
+         ? lesson.content.testCases[0].expectedOutput
+         : "";
 
    const handleRunCode = async (code: string) => {
       try {
-         const match = code.match(/print\s*\(\s*["'](.+?)["']\s*\)/);
+         let match;
+         let printedValue = "";
 
-         if (match) {
-            const printedValue = match[1];
+         // Match based on language
+         if (lesson.language === "python") {
+            match = code.match(/print\s*\(\s*["'](.+?)["']\s*\)/);
+            if (match) {
+               printedValue = match[1];
+            }
+         } else if (lesson.language === "javascript") {
+            match = code.match(/console\.log\s*\(\s*["'](.+?)["']\s*\)/);
+            if (match) {
+               printedValue = match[1];
+            }
+         } else if (lesson.language === "html") {
+            // For HTML, just check if the code contains the expected output
+            if (code.includes(expectedOutput)) {
+               printedValue = expectedOutput;
+            }
+         }
+
+         if (printedValue) {
             setOutput(printedValue);
 
             if (printedValue === expectedOutput) {
@@ -29,7 +76,12 @@ print("Hello World")`;
                setIsCorrect(false);
             }
          } else {
-            setOutput("Error: No print statement found");
+            const errorMessages: Record<string, string> = {
+               python: "Error: No print() statement found",
+               javascript: "Error: No console.log() statement found",
+               html: "Error: Expected output not found in HTML",
+            };
+            setOutput(errorMessages[lesson.language] || "Error: Invalid code");
             setIsCorrect(false);
          }
       } catch (error) {
@@ -40,7 +92,22 @@ print("Hello World")`;
 
    const handleNextLesson = () => {
       setShowSuccessModal(false);
-      console.log("Moving to next lesson...");
+      console.log("Moving to next lesson from:", lessonId);
+
+      // Find next lesson
+      if (course) {
+         const allLessons = course.modules.flatMap((m) => m.lessons);
+         const currentIndex = allLessons.findIndex((l) => l.id === lessonId);
+
+         if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
+            const nextLesson = allLessons[currentIndex + 1];
+            console.log("Next lesson:", nextLesson.id);
+            onNextLesson?.(nextLesson.id);
+         } else {
+            console.log("This is the last lesson!");
+            // TODO: Show course completion screen
+         }
+      }
    };
 
    return (
@@ -49,19 +116,19 @@ print("Hello World")`;
             isOpen={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
             onNextLesson={handleNextLesson}
-            xpEarned={10}
-            lessonTitle="Twój pierwszy program w Pythonie"
+            xpReward={lesson.xpReward}
+            lessonTitle={lesson.title}
          />
          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
             <div className="max-w-7xl mx-auto">
                <div className="mb-6">
                   <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
-                     <span>Python dla początkujących</span>
+                     <span>{course?.title || "Kurs"}</span>
                      <span>›</span>
-                     <span>Lekcja 1</span>
+                     <span>Lekcja {lesson.orderIndex}</span>
                   </div>
                   <h1 className="text-3xl font-bold text-slate-800">
-                     Twój pierwszy program w Pythonie
+                     {lesson.title}
                   </h1>
                </div>
 
@@ -73,52 +140,59 @@ print("Hello World")`;
                         </h2>
                         <div className="prose prose-sm">
                            <p className="text-slate-700 mb-4">
-                              W Pythonie używamy funkcji{" "}
-                              <code className="bg-slate-100 px-2 py-1 rounded text-sm text-slate-700">
-                                 print()
-                              </code>{" "}
-                              do wyświetlania tekstu na ekranie.
+                              {lesson.description}
                            </p>
-                           <p className="text-slate-700 mb-4">
-                              Tekst musi być umieszczony w cudzysłowie
-                              (pojedynczym lub podwójnym).
-                           </p>
-                           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-                              <p className="text-sm text-blue-900">
-                                 💡 <strong>Wskazówka:</strong> Uruchom kod
-                                 przyciskiem "Run Code" aby zobaczyć wynik!
-                              </p>
-                           </div>
+                           {lesson.content.type === "exercise" &&
+                              lesson.content.hint && (
+                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                                    <p className="text-sm text-blue-900">
+                                       💡 <strong>Wskazówka:</strong>{" "}
+                                       {lesson.content.hint}
+                                    </p>
+                                 </div>
+                              )}
                         </div>
                      </div>
 
-                     <div className="bg-gray-900 rounded-lg p-4">
-                        <p className="text-xs text-gray-400 mb-2">Przykład:</p>
-                        <pre className="text-green-400 font-mono text-sm">
-                           <code>print("Witaj świecie!")</code>
-                        </pre>
-                        <p className="text-xs text-gray-400 mt-2">Wynik:</p>
-                        <pre className="text-white font-mono text-sm">
-                           <code>Witaj świecie!</code>
-                        </pre>
-                     </div>
+                     {lesson.content.type === "exercise" &&
+                        lesson.content.solution && (
+                           <div className="bg-gray-900 rounded-lg p-4">
+                              <p className="text-xs text-gray-400 mb-2">
+                                 Przykład:
+                              </p>
+                              <pre className="text-green-400 font-mono text-sm">
+                                 <code>{lesson.content.solution}</code>
+                              </pre>
+                              {expectedOutput && (
+                                 <>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                       Wynik:
+                                    </p>
+                                    <pre className="text-white font-mono text-sm">
+                                       <code>{expectedOutput}</code>
+                                    </pre>
+                                 </>
+                              )}
+                           </div>
+                        )}
 
-                     <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
-                        <h3 className="text-lg font-semibold text-purple-900 mb-2">
-                           🎯 Twoje zadanie
-                        </h3>
-                        <p className="text-purple-800">
-                           Zmodyfikuj kod po prawej tak, aby wypisał:{" "}
-                           <strong>"Hello World"</strong>
-                        </p>
-                     </div>
+                     {lesson.content.type === "exercise" && (
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
+                           <h3 className="text-lg font-semibold text-purple-900 mb-2">
+                              🎯 Twoje zadanie
+                           </h3>
+                           <p className="text-purple-800">
+                              {lesson.content.instruction}
+                           </p>
+                        </div>
+                     )}
 
                      <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <span className="text-yellow-900 font-medium">
                            Nagroda za ukończenie:
                         </span>
                         <span className="text-2xl font-bold text-yellow-600">
-                           +10 XP
+                           +{lesson.xpReward} XP
                         </span>
                      </div>
                   </div>
@@ -128,7 +202,7 @@ print("Hello World")`;
                         <h2 className="text-xl font-semibold text-slate-800 mb-3"></h2>
                         <CodeEditor
                            initialCode={starterCode}
-                           language="python"
+                           language={lesson.language}
                            onRun={handleRunCode}
                            height="300px"
                            theme="vs-dark"

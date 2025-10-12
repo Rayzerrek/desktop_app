@@ -2,11 +2,13 @@ import { useState } from "react";
 
 interface RegisterFormProps {
    onSubmit: (email: string, password: string, username: string) => void;
+   onError?: (message: string) => void;
    disabled?: boolean;
 }
 
 export default function RegisterForm({
    onSubmit,
+   onError,
    disabled = false,
 }: RegisterFormProps) {
    const [username, setUsername] = useState("");
@@ -17,7 +19,7 @@ export default function RegisterForm({
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       if (password !== confirmPassword) {
-         alert("Hasła nie są identyczne!");
+         onError?.("Hasła nie są identyczne!");
          return;
       }
       onSubmit(email, password, username);
