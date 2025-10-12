@@ -62,7 +62,7 @@ export default function RegisterForm({ onSubmit, disabled = false }: RegisterFor
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          minLength={6}
+          minLength={8}
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
           placeholder="••••••••"
         />
@@ -78,7 +78,7 @@ export default function RegisterForm({ onSubmit, disabled = false }: RegisterFor
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          minLength={6}
+          minLength={8}
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"
           placeholder="••••••••"
         />
