@@ -102,6 +102,12 @@ async fn register_user(
     }
 }
 
+#[tauri::command]
+async fn google_sign_in() -> Result<String, String> {
+    let client = create_supabase_client()?;
+    client.sign_in_with_google().await
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(debug_assertions)]
@@ -113,7 +119,11 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![login_user, register_user])
+        .invoke_handler(tauri::generate_handler![
+            login_user,
+            register_user,
+            google_sign_in
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

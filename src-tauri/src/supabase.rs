@@ -151,6 +151,53 @@ impl SupabaseClient {
         }
     }
 
+    pub async fn sign_in_with_google(&self) -> Result<String, String> {
+        let url = format!("{}/auth/v1/authorize?provider=google", self.url);
+        Ok(url)
+    }
+
+    pub async fn exchange_code_for_session(
+        &self,
+        code: &str,
+    ) -> Result<SupabaseAuthResponse, String> {
+        let url = format!("{}/auth/v1/token?grant_type=authorization_code", self.url);
+
+        let body = json!({
+            "auth_code": code
+        });
+
+        let response = self
+            .client
+            .post(&url)
+            .header("apikey", &self.anon_key)
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| format!("Network error: {}", e))?;
+
+        if response.status().is_success() {
+            let response_text = response
+                .text()
+                .await
+                .map_err(|e| format!("Failed to read response: {}", e))?;
+
+            serde_json::from_str::<SupabaseAuthResponse>(&response_text)
+                .map_err(|e| format!("Failed to parse response: {}", e))
+        } else {
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+
+            if let Ok(error) = serde_json::from_str::<SupabaseError>(&error_text) {
+                Err(error.error_description.unwrap_or(error.error))
+            } else {
+                Err(error_text)
+            }
+        }
+    }
+
     pub async fn get_user_profile(
         &self,
         user_id: &str,

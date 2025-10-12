@@ -52,34 +52,34 @@ print("Hello World")`;
             xpEarned={10}
             lessonTitle="Twój pierwszy program w Pythonie"
          />
-         <div className="min-h-screen bg-gray-50 p-6">
+         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
             <div className="max-w-7xl mx-auto">
                <div className="mb-6">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-2">
                      <span>Python dla początkujących</span>
                      <span>›</span>
                      <span>Lekcja 1</span>
                   </div>
-                  <h1 className="text-3xl font-bold text-gray-900">
+                  <h1 className="text-3xl font-bold text-slate-800">
                      Twój pierwszy program w Pythonie
                   </h1>
                </div>
 
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6 space-y-6">
                      <div>
-                        <h2 className="text-xl font-semibold text-gray-800 mb-3">
+                        <h2 className="text-xl font-semibold text-slate-800 mb-3">
                            📚 Instrukcja
                         </h2>
                         <div className="prose prose-sm">
-                           <p className="text-gray-700 mb-4">
+                           <p className="text-slate-700 mb-4">
                               W Pythonie używamy funkcji{" "}
-                              <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                              <code className="bg-slate-100 px-2 py-1 rounded text-sm text-slate-700">
                                  print()
                               </code>{" "}
                               do wyświetlania tekstu na ekranie.
                            </p>
-                           <p className="text-gray-700 mb-4">
+                           <p className="text-slate-700 mb-4">
                               Tekst musi być umieszczony w cudzysłowie
                               (pojedynczym lub podwójnym).
                            </p>
@@ -125,9 +125,7 @@ print("Hello World")`;
 
                   <div className="space-y-6">
                      <div>
-                        <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                           💻 Edytor kodu
-                        </h2>
+                        <h2 className="text-xl font-semibold text-slate-800 mb-3"></h2>
                         <CodeEditor
                            initialCode={starterCode}
                            language="python"
@@ -138,14 +136,11 @@ print("Hello World")`;
                      </div>
 
                      <div>
-                        <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                           📤 Wynik
-                        </h2>
-                        <div className="bg-gray-900 rounded-lg p-4 min-h-[120px] font-mono text-sm">
+                        <div className="bg-gray-900 rounded-lg p-4 min-h-[120px] font-mono text-xl">
                            {output ? (
                               <div>
-                                 <div className="text-gray-400 text-xs mb-2">
-                                    Output:
+                                 <div className="text-gray-400 text-sm mb-2">
+                                    Wynik:
                                  </div>
                                  <div className="text-green-400">{output}</div>
                               </div>
@@ -158,7 +153,7 @@ print("Hello World")`;
                      </div>
 
                      {isCorrect === false && (
-                        <div className="rounded-lg p-5 bg-red-50 border-2 border-red-500">
+                        <div className="rounded-lg p-5 bg-red-50/80 backdrop-blur-sm border-2 border-red-400">
                            <div className="flex items-center gap-2 mb-2">
                               <span className="text-3xl">❌</span>
                               <h3 className="text-xl font-bold text-red-900">
