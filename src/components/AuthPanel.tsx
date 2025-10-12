@@ -35,7 +35,6 @@ export default function AuthPanel() {
             });
             console.log("User ID:", response.user_id);
 
-            // Store tokens in localStorage
             if (response.access_token) {
                localStorage.setItem("access_token", response.access_token);
             }
@@ -45,8 +44,6 @@ export default function AuthPanel() {
             if (response.user_id) {
                localStorage.setItem("user_id", response.user_id);
             }
-
-            // TODO: Navigate to main app screen
          } else {
             setToast({
                message: response.message,
@@ -83,7 +80,6 @@ export default function AuthPanel() {
             });
             console.log("User ID:", response.user_id);
 
-            // Store tokens in localStorage
             if (response.access_token) {
                localStorage.setItem("access_token", response.access_token);
             }
@@ -93,8 +89,6 @@ export default function AuthPanel() {
             if (response.user_id) {
                localStorage.setItem("user_id", response.user_id);
             }
-
-            // Switch to login view (or navigate to main app)
             setIsLogin(true);
          } else {
             setToast({

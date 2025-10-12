@@ -1,7 +1,6 @@
 use serde::Deserialize;
 use serde_json::json;
 
-// Supabase Auth Response structures
 #[derive(Debug, Deserialize)]
 pub struct SupabaseAuthResponse {
     pub access_token: Option<String>,
@@ -25,7 +24,6 @@ pub struct SupabaseError {
     pub error_description: Option<String>,
 }
 
-// Supabase Client
 pub struct SupabaseClient {
     url: String,
     anon_key: String,
@@ -41,7 +39,6 @@ impl SupabaseClient {
         }
     }
 
-    // Sign up new user
     pub async fn sign_up(
         &self,
         email: &str,
@@ -72,10 +69,7 @@ impl SupabaseClient {
             .json(&body)
             .send()
             .await
-            .map_err(|e| {
-                eprintln!("❌ Network error during signup: {:?}", e);
-                format!("Network error: {}", e)
-            })?;
+            .map_err(|e| format!("Network error: {}", e))?;
 
         println!("📥 Response status: {}", response.status());
 
@@ -87,19 +81,14 @@ impl SupabaseClient {
 
             println!("📋 Response body: {}", response_text);
 
-            serde_json::from_str::<SupabaseAuthResponse>(&response_text).map_err(|e| {
-                format!(
-                    "Failed to parse response: {}. Body was: {}",
-                    e, response_text
-                )
-            })
+            serde_json::from_str::<SupabaseAuthResponse>(&response_text)
+                .map_err(|e| format!("Failed to parse response: {}", e))
         } else {
             let error_text = response
                 .text()
                 .await
                 .unwrap_or_else(|_| "Unknown error".to_string());
 
-            // Try to parse as SupabaseError
             if let Ok(error) = serde_json::from_str::<SupabaseError>(&error_text) {
                 Err(error.error_description.unwrap_or(error.error))
             } else {
@@ -108,7 +97,6 @@ impl SupabaseClient {
         }
     }
 
-    // Sign in existing user
     pub async fn sign_in(
         &self,
         email: &str,
@@ -135,10 +123,7 @@ impl SupabaseClient {
             .json(&body)
             .send()
             .await
-            .map_err(|e| {
-                eprintln!("❌ Network error during login: {:?}", e);
-                format!("Network error: {}", e)
-            })?;
+            .map_err(|e| format!("Network error: {}", e))?;
 
         println!("📥 Response status: {}", response.status());
 
@@ -150,19 +135,14 @@ impl SupabaseClient {
 
             println!("📋 Response body: {}", response_text);
 
-            serde_json::from_str::<SupabaseAuthResponse>(&response_text).map_err(|e| {
-                format!(
-                    "Failed to parse response: {}. Body was: {}",
-                    e, response_text
-                )
-            })
+            serde_json::from_str::<SupabaseAuthResponse>(&response_text)
+                .map_err(|e| format!("Failed to parse response: {}", e))
         } else {
             let error_text = response
                 .text()
                 .await
                 .unwrap_or_else(|_| "Unknown error".to_string());
 
-            // Try to parse as SupabaseError
             if let Ok(error) = serde_json::from_str::<SupabaseError>(&error_text) {
                 Err(error.error_description.unwrap_or(error.error))
             } else {
@@ -171,7 +151,6 @@ impl SupabaseClient {
         }
     }
 
-    // Get user profile from database
     pub async fn get_user_profile(
         &self,
         user_id: &str,
@@ -203,7 +182,6 @@ impl SupabaseClient {
         }
     }
 
-    // Sign out user
     pub async fn sign_out(&self, access_token: &str) -> Result<(), String> {
         let url = format!("{}/auth/v1/logout", self.url);
 
@@ -228,30 +206,12 @@ impl SupabaseClient {
     }
 }
 
-// Helper function to load environment variables
 pub fn get_supabase_config() -> Result<(String, String), String> {
-    // For Tauri, we'll use tauri::api::path to get the resource directory
-    // But for now, we'll use environment variables that should be set at compile time
+    let url = std::env::var("SUPABASE_URL")
+        .map_err(|_| "SUPABASE_URL not set in environment".to_string())?;
 
-    // In production, you might want to bundle these in tauri.conf.json or use a config file
-    let url = std::env::var("SUPABASE_URL").map_err(|_| {
-        eprintln!("❌ SUPABASE_URL not found in environment variables");
-        eprintln!("💡 Make sure your .env file exists and contains SUPABASE_URL");
-        "SUPABASE_URL not set in environment".to_string()
-    })?;
-
-    let anon_key = std::env::var("SUPABASE_ANON_KEY").map_err(|_| {
-        eprintln!("❌ SUPABASE_ANON_KEY not found in environment variables");
-        eprintln!("💡 Make sure your .env file exists and contains SUPABASE_ANON_KEY");
-        "SUPABASE_ANON_KEY not set in environment".to_string()
-    })?;
-
-    println!("✅ Supabase config loaded");
-    println!("   URL: {}", url);
-    println!(
-        "   Key: {}...",
-        &anon_key.chars().take(20).collect::<String>()
-    );
+    let anon_key = std::env::var("SUPABASE_ANON_KEY")
+        .map_err(|_| "SUPABASE_ANON_KEY not set in environment".to_string())?;
 
     Ok((url, anon_key))
 }

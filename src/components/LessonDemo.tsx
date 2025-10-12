@@ -13,19 +13,15 @@ print("Hello World")`;
    const expectedOutput = "Hello World";
 
    const handleRunCode = async (code: string) => {
-      // Symulacja wykonania kodu (w prawdziwej aplikacji użyjesz Piston API lub Judge0)
       try {
-         // Mock execution - sprawdzamy czy kod zawiera print("Hello World")
          const match = code.match(/print\s*\(\s*["'](.+?)["']\s*\)/);
 
          if (match) {
             const printedValue = match[1];
             setOutput(printedValue);
 
-            // Sprawdź czy output jest poprawny
             if (printedValue === expectedOutput) {
                setIsCorrect(true);
-               // Show success modal after a brief delay
                setTimeout(() => {
                   setShowSuccessModal(true);
                }, 500);
@@ -44,7 +40,6 @@ print("Hello World")`;
 
    const handleNextLesson = () => {
       setShowSuccessModal(false);
-      // TODO: Navigate to next lesson
       console.log("Moving to next lesson...");
    };
 
@@ -59,7 +54,6 @@ print("Hello World")`;
          />
          <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
-               {/* Header */}
                <div className="mb-6">
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                      <span>Python dla początkujących</span>
@@ -72,7 +66,6 @@ print("Hello World")`;
                </div>
 
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Left side - Instructions */}
                   <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
                      <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">
@@ -99,7 +92,6 @@ print("Hello World")`;
                         </div>
                      </div>
 
-                     {/* Example */}
                      <div className="bg-gray-900 rounded-lg p-4">
                         <p className="text-xs text-gray-400 mb-2">Przykład:</p>
                         <pre className="text-green-400 font-mono text-sm">
@@ -111,7 +103,6 @@ print("Hello World")`;
                         </pre>
                      </div>
 
-                     {/* Task */}
                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
                         <h3 className="text-lg font-semibold text-purple-900 mb-2">
                            🎯 Twoje zadanie
@@ -122,7 +113,6 @@ print("Hello World")`;
                         </p>
                      </div>
 
-                     {/* XP Reward */}
                      <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <span className="text-yellow-900 font-medium">
                            Nagroda za ukończenie:
@@ -133,9 +123,7 @@ print("Hello World")`;
                      </div>
                   </div>
 
-                  {/* Right side - Code Editor & Output */}
                   <div className="space-y-6">
-                     {/* Editor */}
                      <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">
                            💻 Edytor kodu
@@ -149,7 +137,6 @@ print("Hello World")`;
                         />
                      </div>
 
-                     {/* Output */}
                      <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-3">
                            📤 Wynik
@@ -170,7 +157,6 @@ print("Hello World")`;
                         </div>
                      </div>
 
-                     {/* Feedback - only show error */}
                      {isCorrect === false && (
                         <div className="rounded-lg p-5 bg-red-50 border-2 border-red-500">
                            <div className="flex items-center gap-2 mb-2">

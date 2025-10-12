@@ -66,7 +66,6 @@ async fn register_user(
                 auth_response.user.id
             );
 
-            // Check if email confirmation is required
             let message = if auth_response.user.confirmation_sent_at.is_some() {
                 format!(
                     "Konto {} zostało utworzone! Sprawdź swojego maila i potwierdź adres email.",
@@ -105,12 +104,10 @@ async fn register_user(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Load environment variables from .env file (only in development)
     #[cfg(debug_assertions)]
     {
         if let Err(e) = dotenvy::dotenv() {
             eprintln!("Warning: Could not load .env file: {}", e);
-            eprintln!("Make sure you have a .env file with SUPABASE_URL and SUPABASE_ANON_KEY");
         }
     }
 

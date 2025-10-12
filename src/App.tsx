@@ -6,17 +6,14 @@ import "./App.css";
 function App() {
    const [currentView, setCurrentView] = useState<"auth" | "lesson">("auth");
 
-   // Check if user is logged in (has token in localStorage)
    const checkAuth = () => {
       const token = localStorage.getItem("access_token");
       return !!token;
    };
 
-   // Show lesson view if logged in OR in dev mode
    if (currentView === "lesson") {
       return (
          <div>
-            {/* Dev button - moved to bottom left */}
             <button
                onClick={() => {
                   setCurrentView("auth");
@@ -30,11 +27,9 @@ function App() {
       );
    }
 
-   // If user is logged in, show lesson
    if (checkAuth()) {
       return (
          <div>
-            {/* Logout button for logged in users */}
             <button
                onClick={() => {
                   localStorage.removeItem("access_token");
@@ -53,11 +48,9 @@ function App() {
 
    return (
       <div>
-         {/* Dev button to skip auth */}
          <button
             onClick={() => setCurrentView("lesson")}
             className="fixed top-4 right-4 z-50 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-xs font-mono"
-            title="Development shortcut to lesson view"
          >
             🚀 DEV: Skip to Lesson
          </button>
