@@ -99,13 +99,19 @@ const pythonLesson4: Lesson = {
    language: "python",
    xpReward: 20,
    orderIndex: 4,
-   estimatedMinutes: 15,
+   estimatedMinutes: 10,
    content: {
       type: "exercise",
       instruction:
          "Pętla for jest używana do iteracji po elementach sekwencji. Funkcja range() tworzy sekwencję liczb całkowitych.",
       starterCode: "# Twój kod \n",
       solution: "for i in range(5):\n    print(i)",
+      testCases:[
+         {
+            expectedOutput: "0\n1\n2\n3\n4\n",
+            description: "Program powinien wyświetlić: 0\n1\n2\n3\n4\n",
+         },
+      ]
    },
 };
 // JavaScript - Lesson 1
