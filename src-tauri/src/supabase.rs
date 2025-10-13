@@ -4,8 +4,6 @@ use serde_json::json;
 #[derive(Debug, Deserialize)]
 pub struct SupabaseAuthResponse {
     pub access_token: Option<String>,
-    pub token_type: Option<String>,
-    pub expires_in: Option<i64>,
     pub refresh_token: Option<String>,
     pub user: SupabaseUser,
 }
@@ -13,8 +11,6 @@ pub struct SupabaseAuthResponse {
 #[derive(Debug, Deserialize)]
 pub struct SupabaseUser {
     pub id: String,
-    pub email: Option<String>,
-    pub user_metadata: Option<serde_json::Value>,
     pub confirmation_sent_at: Option<String>,
 }
 
@@ -160,7 +156,6 @@ impl SupabaseClient {
         &self,
         access_token: &str,
     ) -> Result<serde_json::Value, String> {
-        // First get the user ID from the token
         let url = format!("{}/auth/v1/user", self.url);
 
         let user_response = self
@@ -188,7 +183,6 @@ impl SupabaseClient {
 
         println!("📝 User ID from token: {}", user_id);
 
-        // Now get the profile with role
         let profile_url = format!("{}/rest/v1/profiles?id=eq.{}&select=*", self.url, user_id);
 
         let profile_response = self

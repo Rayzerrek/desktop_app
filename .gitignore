@@ -28,7 +28,10 @@ dist-ssr
 *.sln
 *.sw?
 
+
+//single files
 supabase-schema.sql
 supabase-add-roles.sql
 supabase-add-rpc-function.sql
+ADMIN_SETUP_INSTRUCTIONS.md
 private.json

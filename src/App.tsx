@@ -6,7 +6,7 @@ import CourseDashboard from "./components/CourseDashboard";
 import AdminPanel from "./components/AdminPanel";
 import Toast, { ToastType } from "./components/Toast";
 import { allCourses } from "./data/sampleLessons";
-import "./App.css";
+import "./styles/App.css";
 
 function App() {
    const [currentView, setCurrentView] = useState<
@@ -57,6 +57,12 @@ function App() {
 
    const handleCourseSelect = (courseId: string) => {
       console.log("Selected course ID:", courseId);
+
+      if (courseId === selectedCourseId) {
+         setCurrentView("dashboard");
+         return;
+      }
+
       setSelectedCourseId(courseId);
 
       const course = allCourses.find((c) => c.id === courseId);
@@ -117,7 +123,7 @@ function App() {
       return <AdminPanel onBack={() => setCurrentView("dashboard")} />;
    }
 
-   if (currentView === "dashboard") {
+   if (currentView === "dashboard" && isAdmin) {
       return (
          <div>
             {toast && (
@@ -150,6 +156,7 @@ function App() {
          </div>
       );
    }
+
 
    if (currentView === "lesson") {
       return (
@@ -195,7 +202,12 @@ function App() {
    return (
       <div>
          <button
-            onClick={() => setCurrentView("dashboard")}
+            onClick={() => {
+               // Dev mode: set fake token to skip auth
+               localStorage.setItem("access_token", "dev_token_skip_auth");
+               localStorage.setItem("user_id", "dev_user");
+               setCurrentView("dashboard");
+            }}
             className="fixed top-4 right-4 z-50 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-xs font-mono"
          >
             🚀 DEV: Skip to Dashboard

@@ -1,7 +1,15 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import CodeEditor from "./CodeEditor";
 import LessonSuccessModal from "./LessonSuccessModal";
 import { getLessonById, allCourses } from "../data/sampleLessons";
+
+interface CodeValidationResponse {
+   success: boolean;
+   output: string;
+   error?: string;
+   is_correct: boolean;
+}
 
 interface LessonDemoProps {
    lessonId?: string;
@@ -43,46 +51,40 @@ export default function LessonDemo({
 
    const handleRunCode = async (code: string) => {
       try {
-         let match;
-         let printedValue = "";
-
-         // Match based on language
-         if (lesson.language === "python") {
-            match = code.match(/print\s*\(\s*["'](.+?)["']\s*\)/);
-            if (match) {
-               printedValue = match[1];
-            }
-         } else if (lesson.language === "javascript") {
-            match = code.match(/console\.log\s*\(\s*["'](.+?)["']\s*\)/);
-            if (match) {
-               printedValue = match[1];
-            }
-         } else if (lesson.language === "html") {
-            // For HTML, just check if the code contains the expected output
+         // For HTML, use old regex method (no execution needed)
+         if (lesson.language === "html") {
             if (code.includes(expectedOutput)) {
-               printedValue = expectedOutput;
-            }
-         }
-
-         if (printedValue) {
-            setOutput(printedValue);
-
-            if (printedValue === expectedOutput) {
+               setOutput(expectedOutput);
                setIsCorrect(true);
                setTimeout(() => {
                   setShowSuccessModal(true);
                }, 500);
             } else {
+               setOutput("Error: Expected output not found in HTML");
                setIsCorrect(false);
             }
-         } else {
-            const errorMessages: Record<string, string> = {
-               python: "Error: No print() statement found",
-               javascript: "Error: No console.log() statement found",
-               html: "Error: Expected output not found in HTML",
-            };
-            setOutput(errorMessages[lesson.language] || "Error: Invalid code");
+            return;
+         }
+
+         // Use Rust backend for Python and JavaScript validation
+         const result = await invoke<CodeValidationResponse>("validate_code", {
+            code,
+            language: lesson.language,
+            expectedOutput: expectedOutput,
+         });
+
+         if (result.error) {
+            setOutput(result.error);
             setIsCorrect(false);
+         } else {
+            setOutput(result.output);
+            setIsCorrect(result.is_correct);
+
+            if (result.is_correct) {
+               setTimeout(() => {
+                  setShowSuccessModal(true);
+               }, 500);
+            }
          }
       } catch (error) {
          setOutput(`Error: ${error}`);

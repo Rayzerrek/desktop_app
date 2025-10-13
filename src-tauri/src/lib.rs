@@ -121,6 +121,122 @@ async fn check_is_admin(access_token: String) -> Result<bool, String> {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CodeValidationRequest {
+    code: String,
+    language: String,
+    expected_output: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CodeValidationResponse {
+    success: bool,
+    output: String,
+    error: Option<String>,
+    is_correct: bool,
+}
+
+#[tauri::command]
+async fn validate_code(
+    code: String,
+    language: String,
+    expected_output: String,
+) -> Result<CodeValidationResponse, String> {
+    println!("🔍 Validating {} code", language);
+
+    match language.as_str() {
+        "python" => validate_python_code(code, expected_output).await,
+        "javascript" => validate_javascript_code(code, expected_output).await,
+        _ => Err(format!("Unsupported language: {}", language)),
+    }
+}
+
+async fn validate_python_code(
+    code: String,
+    expected_output: String,
+) -> Result<CodeValidationResponse, String> {
+    use std::process::Command;
+
+    let output = Command::new("python")
+        .arg("-c")
+        .arg(&code)
+        .output();
+
+    match output {
+        Ok(result) => {
+            let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
+            let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+
+            if !stderr.is_empty() {
+                return Ok(CodeValidationResponse {
+                    success: false,
+                    output: stderr.clone(),
+                    error: Some(stderr),
+                    is_correct: false,
+                });
+            }
+
+            let is_correct = stdout == expected_output;
+
+            Ok(CodeValidationResponse {
+                success: true,
+                output: stdout,
+                error: None,
+                is_correct,
+            })
+        }
+        Err(e) => Ok(CodeValidationResponse {
+            success: false,
+            output: String::new(),
+            error: Some(format!("Nie można uruchomić Pythona: {}. Upewnij się, że Python jest zainstalowany.", e)),
+            is_correct: false,
+        }),
+    }
+}
+
+async fn validate_javascript_code(
+    code: String,
+    expected_output: String,
+) -> Result<CodeValidationResponse, String> {
+    use std::process::Command;
+
+    let output = Command::new("node")
+        .arg("-e")
+        .arg(&code)
+        .output();
+
+    match output {
+        Ok(result) => {
+            let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
+            let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+
+            if !stderr.is_empty() {
+                return Ok(CodeValidationResponse {
+                    success: false,
+                    output: stderr.clone(),
+                    error: Some(stderr),
+                    is_correct: false,
+                });
+            }
+
+            let is_correct = stdout == expected_output;
+
+            Ok(CodeValidationResponse {
+                success: true,
+                output: stdout,
+                error: None,
+                is_correct,
+            })
+        }
+        Err(e) => Ok(CodeValidationResponse {
+            success: false,
+            output: String::new(),
+            error: Some(format!("Nie można uruchomić Node.js: {}. Upewnij się, że Node.js jest zainstalowany.", e)),
+            is_correct: false,
+        }),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(debug_assertions)]
@@ -136,7 +252,8 @@ pub fn run() {
             login_user,
             register_user,
             google_sign_in,
-            check_is_admin
+            check_is_admin,
+            validate_code
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
