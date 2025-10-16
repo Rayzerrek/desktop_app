@@ -26,6 +26,7 @@ pub struct SupabaseClient {
     client: reqwest::Client,
 }
 
+#[allow(dead_code)]
 impl SupabaseClient {
     pub fn new(url: String, anon_key: String) -> Self {
         Self {

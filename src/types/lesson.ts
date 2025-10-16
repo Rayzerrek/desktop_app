@@ -96,3 +96,9 @@ export interface UserProgress {
    completedAt?: string;
    timeSpentSeconds?: number;
 }
+
+export interface UserCourseProgress {
+   courseId: string;
+   progress: UserProgress[];
+}
+export type UserProgressData = UserProgress | UserCourseProgress;

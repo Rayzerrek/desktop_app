@@ -51,7 +51,6 @@ export default function LessonDemo({
 
    const handleRunCode = async (code: string) => {
       try {
-         // For HTML, use old regex method (no execution needed)
          if (lesson.language === "html") {
             if (code.includes(expectedOutput)) {
                setOutput(expectedOutput);
@@ -66,7 +65,6 @@ export default function LessonDemo({
             return;
          }
 
-         // Use Rust backend for Python and JavaScript validation
          const result = await invoke<CodeValidationResponse>("validate_code", {
             code,
             language: lesson.language,
@@ -107,7 +105,6 @@ export default function LessonDemo({
             onNextLesson?.(nextLesson.id);
          } else {
             console.log("This is the last lesson!");
-            // TODO: Show course completion screen
          }
       }
    };
@@ -144,15 +141,7 @@ export default function LessonDemo({
                            <p className="text-slate-700 mb-4">
                               {lesson.description}
                            </p>
-                           {lesson.content.type === "exercise" &&
-                              lesson.content.hint && (
-                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-                                    <p className="text-sm text-blue-900">
-                                       💡 <strong>Wskazówka:</strong>{" "}
-                                       {lesson.content.hint}
-                                    </p>
-                                 </div>
-                              )}
+                           
                         </div>
                      </div>
 
@@ -177,6 +166,7 @@ export default function LessonDemo({
                               )}
                            </div>
                         )}
+                        
 
                      {lesson.content.type === "exercise" && (
                         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
@@ -188,6 +178,15 @@ export default function LessonDemo({
                            </p>
                         </div>
                      )}
+                     {lesson.content.type === "exercise" &&
+                              lesson.content.hint && (
+                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                                    <p className="text-sm text-blue-900">
+                                       💡 <strong>Wskazówka:</strong>{" "}
+                                       {lesson.content.hint}
+                                    </p>
+                                 </div>
+                              )}
 
                      <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <span className="text-yellow-900 font-medium">

@@ -12,15 +12,15 @@ const pythonLesson1: Lesson = {
    estimatedMinutes: 5,
    content: {
       type: "exercise",
-      instruction: "Napisz kod, który wyświetli w konsoli tekst: Hello World",
+      instruction: "Napisz kod, który wyświetli w konsoli tekst: Witaj świecie",
       starterCode:
-         '# Napisz kod, który wypisze "Hello World"\nprint("Hello World")',
-      solution: 'print("Hello World")',
+         '# Napisz kod, który wypisze "Witaj świecie"',
+      solution: 'print("Witaj świecie")',
       hint: "Użyj funkcji print() i umieść tekst w cudzysłowie",
       testCases: [
          {
-            expectedOutput: "Hello World",
-            description: "Program powinien wyświetlić dokładnie: Hello World",
+            expectedOutput: "Witaj świecie",
+            description: "Program powinien wyświetlić dokładnie: Witaj świecie",
          },
       ],
    },
@@ -96,15 +96,15 @@ const pythonLesson4: Lesson = {
    id: "py-004",
    title: "Pętle w Pythonie",
    lessonType: "exercise",
+   description:"Pętla for jest używana do iteracji po elementach sekwencji. Funkcja range() tworzy sekwencję liczb całkowitych.",
    language: "python",
    xpReward: 20,
    orderIndex: 4,
    estimatedMinutes: 10,
    content: {
       type: "exercise",
-      instruction:
-         "Pętla for jest używana do iteracji po elementach sekwencji. Funkcja range() tworzy sekwencję liczb całkowitych.",
       starterCode: "# Twój kod \n",
+      instruction:"Stwórz pętlę for, która wyświetli liczby od 0 do 4.",
       solution: "for i in range(5):\n    print(i)",
       testCases:[
          {
