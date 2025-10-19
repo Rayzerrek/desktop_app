@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Input } from "./common/Input";
 
 interface LoginFormProps {
    onSubmit: (email: string, password: string) => void;
    disabled?: boolean;
 }
+
 
 export default function LoginForm({
    onSubmit,
@@ -19,41 +21,23 @@ export default function LoginForm({
 
    return (
       <form onSubmit={handleSubmit} className="space-y-6">
-         <div>
-            <label
-               htmlFor="email"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Email
-            </label>
-            <input
-               id="email"
-               type="email"
-               value={email}
-               onChange={(e) => setEmail(e.target.value)}
-               required
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="twoj@email.com"
-            />
-         </div>
+         <Input 
+            label="Email"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            required
+            placeholder="twoj@email.com"
+         />
 
-         <div>
-            <label
-               htmlFor="password"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Hasło
-            </label>
-            <input
-               id="password"
-               type="password"
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
-               required
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="••••••••"
-            />
-         </div>
+         <Input 
+            label="Hasło"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            required
+            placeholder="••••••••"
+         />
 
          <button
             type="submit"

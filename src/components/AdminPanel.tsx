@@ -13,11 +13,9 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
    );
    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
    const [selectedModule, setSelectedModule] = useState<Module | null>(null);
-   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState(true);
-   
-   // State for creating courses
+
    const [newCourse, setNewCourse] = useState({
       title: "",
       description: "",
@@ -27,7 +25,6 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
       estimatedHours: 10,
    });
 
-   // State for creating modules
    const [newModule, setNewModule] = useState({
       title: "",
       description: "",
@@ -97,8 +94,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
          });
 
          alert("Lekcja utworzona!");
-         setIsCreatingLesson(false);
-         
+
          setNewLesson({
             title: "",
             description: "",
@@ -114,8 +110,8 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
 
          loadCourses();
       } catch (error) {
-         console.error("Błąd tworzenia lekcji:", error);
-         alert("Błąd: " + error);
+         console.error("Error creating lesson:", error);
+         alert("Error: " + error);
       }
    };
 
@@ -127,6 +123,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             difficulty: newCourse.difficulty,
             language: newCourse.language,
             color: newCourse.color,
+            order_index: 0,
             isPublished: true,
             estimatedHours: newCourse.estimatedHours,
          });
@@ -140,12 +137,12 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             color: "#3B82F6",
             estimatedHours: 10,
          });
-         
+
          await loadCourses();
          setSelectedCourse(created);
       } catch (error) {
-         console.error("Błąd tworzenia kursu:", error);
-         alert("Błąd: " + error);
+         console.error("Error creating course:", error);
+         alert("Error: " + error);
       }
    };
 
@@ -170,14 +167,26 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             description: "",
             iconEmoji: "📚",
          });
-         
+
          await loadCourses();
          setSelectedModule(created);
       } catch (error) {
-         console.error("Błąd tworzenia modułu:", error);
-         alert("Błąd: " + error);
+         console.error("Error creating module:", error);
+         alert("Error: " + error);
       }
    };
+   const handleDeleteCourse = async (courseId: string) => {
+      try {
+         await lessonService.deleteCourse(courseId);
+         alert("Kurs usunięty pomyślnie!");
+         await loadCourses(); // Przeładuj listę kursów
+         setSelectedCourse(null); // Wyczyść wybrany kurs
+         setSelectedModule(null); // Wyczyść wybrany moduł
+      } catch (error) {
+         console.error("Error deleting course:", error);
+         alert("Błąd podczas usuwania kursu: " + error);
+      }
+   }
 
    return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
@@ -202,44 +211,37 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             <div className="flex gap-2 mb-6 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-lg border border-white/20">
                <button
                   onClick={() => setActiveTab("courses")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-                     activeTab === "courses"
+                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "courses"
                         ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
                         : "text-slate-600 hover:bg-slate-100"
-                  }`}
+                     }`}
                >
                   Kursy
                </button>
                <button
                   onClick={() => setActiveTab("create-course")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-                     activeTab === "create-course"
+                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "create-course"
                         ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
                         : "text-slate-600 hover:bg-slate-100"
-                  }`}
+                     }`}
                >
                   Utwórz kurs
                </button>
                <button
                   onClick={() => setActiveTab("lessons")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-                     activeTab === "lessons"
+                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "lessons"
                         ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
                         : "text-slate-600 hover:bg-slate-100"
-                  }`}
+                     }`}
                >
                   Wszystkie lekcje
                </button>
                <button
-                  onClick={() => {
-                     setActiveTab("create");
-                     setIsCreatingLesson(true);
-                  }}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${
-                     activeTab === "create"
+                  onClick={() => setActiveTab("create")}
+                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "create"
                         ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
                         : "text-slate-600 hover:bg-slate-100"
-                  }`}
+                     }`}
                >
                   Utwórz lekcję
                </button>
@@ -258,97 +260,106 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                            <p className="text-slate-600">Ładowanie...</p>
                         </div>
                      ) : (
-                     <div className="space-y-4">
-                        {courses.map((course: Course) => (
-                           <div
-                              key={course.id}
-                              className="p-4 bg-slate-50 rounded-lg border-2 border-slate-200 hover:shadow-md transition"
-                           >
-                              <div className="flex items-center justify-between mb-3">
-                                 <div>
-                                    <h3 className="text-xl font-semibold text-slate-800">
-                                       {course.title}
-                                    </h3>
-                                    <p className="text-sm text-slate-600">
-                                       {course.modules.length} modułów •{" "}
-                                       {course.modules.reduce(
-                                          (acc, m) => acc + m.lessons.length,
-                                          0,
-                                       )}{" "}
-                                       lekcji
-                                    </p>
-                                 </div>
-                                 <button
-                                    onClick={() => {
-                                       setSelectedCourse(selectedCourse?.id === course.id ? null : course);
-                                       setSelectedModule(null);
-                                    }}
-                                    className={`px-4 py-2 rounded-lg transition text-sm font-medium ${
-                                       selectedCourse?.id === course.id
-                                          ? "bg-purple-500 text-white"
-                                          : "bg-blue-500 hover:bg-blue-600 text-white"
-                                    }`}
-                                 >
-                                    {selectedCourse?.id === course.id ? "✓ Wybrany" : "Wybierz"}
-                                 </button>
-                              </div>
-
-                              {/* Modules List */}
-                              {selectedCourse?.id === course.id && (
-                                 <div className="mt-4 space-y-2 pl-4 border-l-4 border-purple-300">
-                                    <p className="text-sm font-medium text-slate-700 mb-2">
-                                       📦 Moduły w tym kursie:
-                                    </p>
-                                    {course.modules.map((module: Module) => (
-                                       <div
-                                          key={module.id}
-                                          className={`p-3 rounded-lg border-2 transition cursor-pointer ${
-                                             selectedModule?.id === module.id
-                                                ? "bg-green-100 border-green-400"
-                                                : "bg-white border-slate-200 hover:border-green-300"
-                                          }`}
-                                          onClick={() => setSelectedModule(
-                                             selectedModule?.id === module.id ? null : module
-                                          )}
-                                       >
-                                          <div className="flex items-center justify-between">
-                                             <div>
-                                                <p className="font-medium text-slate-800">
-                                                   {module.iconEmoji} {module.title}
-                                                </p>
-                                                <p className="text-sm text-slate-600">
-                                                   {module.lessons.length} lekcji
-                                                </p>
-                                             </div>
-                                             {selectedModule?.id === module.id && (
-                                                <div className="flex items-center gap-2">
-                                                   <span className="px-3 py-1 bg-green-500 text-white text-xs rounded-full">
-                                                      Wybrany
-                                                   </span>
-                                                   <button
-                                                      onClick={(e) => {
-                                                         e.stopPropagation();
-                                                         setActiveTab("create");
-                                                      }}
-                                                      className="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded-lg transition"
-                                                   >
-                                                      Dodaj lekcję
-                                                   </button>
-                                                </div>
-                                             )}
-                                          </div>
-                                       </div>
-                                    ))}
-                                    {course.modules.length === 0 && (
-                                       <p className="text-sm text-slate-500 italic">
-                                          Brak modułów. Utwórz pierwszy moduł w zakładce "Utwórz kurs".
+                        <div className="space-y-4">
+                           {courses.map((course: Course) => (
+                              <div
+                                 key={course.id}
+                                 className="p-4 bg-slate-50 rounded-lg border-2 border-slate-200 hover:shadow-md transition"
+                              >
+                                 <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                       <h3 className="text-xl font-semibold text-slate-800">
+                                          {course.title}
+                                       </h3>
+                                       <p className="text-sm text-slate-600">
+                                          {course.modules.length} modułów •{" "}
+                                          {course.modules.reduce(
+                                             (acc, m) => acc + m.lessons.length,
+                                             0,
+                                          )}{" "}
+                                          lekcji
                                        </p>
-                                    )}
+
+                                    </div>
+                                    <div className="flex items-end gap-3">
+                                       <button
+                                          onClick={() => {handleDeleteCourse(course.id)}}
+                                          className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition"
+                                       >
+                                          Usuń
+                                       </button>
+                                       <button
+                                          onClick={() => {
+                                             setSelectedCourse(selectedCourse?.id === course.id ? null : course);
+                                             setSelectedModule(null);
+                                          }}
+                                          className={`px-4 py-2 rounded-lg transition text-sm font-medium ${selectedCourse?.id === course.id
+                                                ? "bg-purple-500 text-white"
+                                                : "bg-blue-500 hover:bg-blue-600 text-white"
+                                             }`}
+                                       >
+                                          {selectedCourse?.id === course.id ? "✓ Wybrany" : "Wybierz"}
+                                       </button>
+                                    </div>
+
+
                                  </div>
-                              )}
-                           </div>
-                        ))}
-                     </div>
+
+                                 {/* Modules List */}
+                                 {selectedCourse?.id === course.id && (
+                                    <div className="mt-4 space-y-2 pl-4 border-l-4 border-purple-300">
+                                       <p className="text-sm font-medium text-slate-700 mb-2">
+                                          📦 Moduły w tym kursie:
+                                       </p>
+                                       {course.modules.map((module: Module) => (
+                                          <div
+                                             key={module.id}
+                                             className={`p-3 rounded-lg border-2 transition cursor-pointer ${selectedModule?.id === module.id
+                                                   ? "bg-green-100 border-green-400"
+                                                   : "bg-white border-slate-200 hover:border-green-300"
+                                                }`}
+                                             onClick={() => setSelectedModule(
+                                                selectedModule?.id === module.id ? null : module
+                                             )}
+                                          >
+                                             <div className="flex items-center justify-between">
+                                                <div>
+                                                   <p className="font-medium text-slate-800">
+                                                      {module.iconEmoji} {module.title}
+                                                   </p>
+                                                   <p className="text-sm text-slate-600">
+                                                      {module.lessons.length} lekcji
+                                                   </p>
+                                                </div>
+                                                {selectedModule?.id === module.id && (
+                                                   <div className="flex items-center gap-2">
+                                                      <span className="px-3 py-1 bg-green-500 text-white text-xs rounded-full">
+                                                         Wybrany
+                                                      </span>
+                                                      <button
+                                                         onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveTab("create");
+                                                         }}
+                                                         className="px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded-lg transition"
+                                                      >
+                                                         Dodaj lekcję
+                                                      </button>
+                                                   </div>
+                                                )}
+                                             </div>
+                                          </div>
+                                       ))}
+                                       {course.modules.length === 0 && (
+                                          <p className="text-sm text-slate-500 italic">
+                                             Brak modułów. Utwórz pierwszy moduł w zakładce "Utwórz kurs".
+                                          </p>
+                                       )}
+                                    </div>
+                                 )}
+                              </div>
+                           ))}
+                        </div>
                      )}
                   </div>
                )}
@@ -364,39 +375,39 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                            <p className="text-slate-600">Ładowanie...</p>
                         </div>
                      ) : (
-                     <div className="space-y-2">
-                        {courses.flatMap((course: Course) =>
-                           course.modules.flatMap((module: Module) =>
-                              module.lessons.map((lesson: Lesson) => (
-                                 <div
-                                    key={lesson.id}
-                                    className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between hover:shadow-md transition"
-                                 >
-                                    <div>
-                                       <span className="text-sm font-mono text-slate-500">
-                                          {lesson.id}
-                                       </span>
-                                       <h4 className="font-semibold text-slate-800">
-                                          {lesson.title}
-                                       </h4>
-                                       <p className="text-sm text-slate-600">
-                                          {course.title} • {lesson.language} •{" "}
-                                          {lesson.xp_reward} XP
-                                       </p>
+                        <div className="space-y-2">
+                           {courses.flatMap((course: Course) =>
+                              course.modules.flatMap((module: Module) =>
+                                 module.lessons.map((lesson: Lesson) => (
+                                    <div
+                                       key={lesson.id}
+                                       className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between hover:shadow-md transition"
+                                    >
+                                       <div>
+                                          <span className="text-sm font-mono text-slate-500">
+                                             {lesson.id}
+                                          </span>
+                                          <h4 className="font-semibold text-slate-800">
+                                             {lesson.title}
+                                          </h4>
+                                          <p className="text-sm text-slate-600">
+                                             {course.title} • {lesson.language} •{" "}
+                                             {lesson.xp_reward} XP
+                                          </p>
+                                       </div>
+                                       <div className="flex gap-2">
+                                          <button className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm">
+                                             Edytuj
+                                          </button>
+                                          <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">
+                                             Usuń
+                                          </button>
+                                       </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                       <button className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm">
-                                          Edytuj
-                                       </button>
-                                       <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">
-                                          Usuń
-                                       </button>
-                                    </div>
-                                 </div>
-                              )),
-                           ),
-                        )}
-                     </div>
+                                 )),
+                              ),
+                           )}
+                        </div>
                      )}
                   </div>
                )}
@@ -412,7 +423,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                         <h3 className="text-xl font-bold text-slate-800 mb-4">
                            Krok 1: Utwórz kurs
                         </h3>
-                        
+
                         <div className="space-y-4">
                            <div className="grid grid-cols-2 gap-4">
                               <div>
@@ -427,7 +438,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                     placeholder="np. Python dla początkujących"
                                  />
                               </div>
-                              
+
                               <div>
                                  <label className="block text-sm font-medium text-slate-700 mb-2">
                                     Język programowania *
@@ -878,7 +889,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                            </button>
                            <button
                               type="button"
-                              onClick={() => setIsCreatingLesson(false)}
+                              onClick={() => setActiveTab("courses")}
                               className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition"
                            >
                               Anuluj

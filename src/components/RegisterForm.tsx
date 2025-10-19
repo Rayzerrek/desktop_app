@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Input } from "./common/Input";
+
 
 interface RegisterFormProps {
    onSubmit: (email: string, password: string, username: string) => void;
@@ -27,79 +29,40 @@ export default function RegisterForm({
 
    return (
       <form onSubmit={handleSubmit} className="space-y-6">
-         <div>
-            <label
-               htmlFor="username"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Nazwa użytkownika
-            </label>
-            <input
-               id="username"
-               type="text"
-               value={username}
-               onChange={(e) => setUsername(e.target.value)}
-               required
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="twoja_nazwa"
-            />
-         </div>
+         <Input
+            label="Nazwa użytkownika"
+            type="text"
+            value={username}
+            onChange={setUsername}
+            required
+            placeholder="twoja_nazwa"
+         />
+         <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            required
+            placeholder="twoj@email.com"
+         />
+         <Input
+            label="Hasło"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            required
+            placeholder="••••••••"
+         />
 
-         <div>
-            <label
-               htmlFor="register-email"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Email
-            </label>
-            <input
-               id="register-email"
-               type="email"
-               value={email}
-               onChange={(e) => setEmail(e.target.value)}
-               required
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="twoj@email.com"
-            />
-         </div>
-
-         <div>
-            <label
-               htmlFor="register-password"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Hasło
-            </label>
-            <input
-               id="register-password"
-               type="password"
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
-               required
-               minLength={8}
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="••••••••"
-            />
-         </div>
-
-         <div>
-            <label
-               htmlFor="confirm-password"
-               className="block text-sm font-medium text-slate-700 mb-2"
-            >
-               Potwierdź hasło
-            </label>
-            <input
-               id="confirm-password"
-               type="password"
-               value={confirmPassword}
-               onChange={(e) => setConfirmPassword(e.target.value)}
-               required
-               minLength={8}
-               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all duration-200"
-               placeholder="••••••••"
-            />
-         </div>
+         <Input
+            label="Potwierdź hasło"
+            type="password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            required
+            minLength={8}
+            placeholder="••••••••"
+         />
 
          <button
             type="submit"

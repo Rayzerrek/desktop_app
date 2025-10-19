@@ -10,7 +10,7 @@ import "./styles/App.css";
 
 function App() {
 
-   const {isAuthenticated, isAdmin, refreshAdmin, logout} = useAuth();
+   const {isAuthenticated, isAdmin, refreshAdmin, login, logout} = useAuth();
    const [currentView, setCurrentView] = useState<
       "auth" | "dashboard" | "lesson" | "admin"
    >("auth");
@@ -26,6 +26,9 @@ function App() {
    useEffect(() => {
       if (isAuthenticated) {
          refreshAdmin();
+         if (currentView === "auth") {
+            setCurrentView("dashboard");
+         }
       }
    }, [isAuthenticated, refreshAdmin, currentView]);
 
@@ -105,43 +108,6 @@ function App() {
       return <AdminPanel onBack={() => setCurrentView("dashboard")} />;
    }
 
-   if (currentView === "dashboard" && isAdmin) {
-      return (
-         <div>
-            {toast && (
-               <Toast
-                  message={toast.message}
-                  type={toast.type}
-                  onClose={() => setToast(null)}
-               />
-            )}
-            <div className="fixed bottom-4 left-4 z-50">
-               <button
-                  onClick={() => {
-                     logout();
-                  }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
-               >
-                  🚪 Wyloguj
-               </button>
-            </div>
-            <button
-               onClick={handleAdminAccess}
-               className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-sm flex items-center gap-2"
-               title={
-                  isAdmin
-                     ? "Masz dostęp admina"
-                     : "Brak dostępu (tylko DEV test)"
-               }
-            >
-               Panel Admina {!isAdmin && "(TEST)"}
-            </button>
-            <CourseDashboard onCourseSelect={handleCourseSelect} />
-         </div>
-      );
-   }
-
-
    if (currentView === "lesson") {
       return (
          <div>
@@ -164,9 +130,16 @@ function App() {
       );
    }
 
-   if (isAuthenticated) {
+   if (isAuthenticated && currentView === "dashboard") {
       return (
          <div>
+            {toast && (
+               <Toast
+                  message={toast.message}
+                  type={toast.type}
+                  onClose={() => setToast(null)}
+               />
+            )}
             <button
                onClick={() => {
                   logout();
@@ -175,6 +148,14 @@ function App() {
             >
                🚪 Wyloguj
             </button>
+            {isAdmin && (
+               <button
+                  onClick={handleAdminAccess}
+                  className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-sm flex items-center gap-2"
+               >
+                  🔐 Panel Admina
+               </button>
+            )}
             <CourseDashboard onCourseSelect={handleCourseSelect} />
          </div>
       );
@@ -186,13 +167,13 @@ function App() {
             onClick={() => {
                localStorage.setItem("access_token", "dev_token_skip_auth");
                localStorage.setItem("user_id", "dev_user");
-               setCurrentView("dashboard");
+               login();
             }}
             className="fixed top-4 right-4 z-50 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-xs font-mono"
          >
             🚀 DEV: Skip to Dashboard
          </button>
-         <AuthPanel onLoginSuccess={() => setCurrentView("dashboard")} />
+         <AuthPanel onLoginSuccess={login} />
       </div>
    );
 }

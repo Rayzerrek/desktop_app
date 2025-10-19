@@ -19,6 +19,11 @@ export function useAuth(){
         }
     }, []);
 
+    const login = useCallback(() => {
+        setIsAuthenticated(true);
+        refreshAdmin();
+    }, [refreshAdmin]);
+
     const logout = useCallback(() => {
         clearAuthTokens();
         setIsAuthenticated(false);
@@ -33,5 +38,5 @@ export function useAuth(){
         }
     }, [refreshAdmin]);
 
-    return { isAuthenticated, isAdmin, refreshAdmin, logout }
+    return { isAuthenticated, isAdmin, refreshAdmin, login, logout }
 }

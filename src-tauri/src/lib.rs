@@ -260,7 +260,8 @@ pub fn run() {
             supabase::create_module,
             supabase::create_lesson,
             supabase::update_lesson,
-            supabase::delete_lesson
+            supabase::delete_lesson,
+            supabase::delete_course
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

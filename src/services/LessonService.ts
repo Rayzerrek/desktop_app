@@ -92,13 +92,23 @@ export class LessonService {
         });
     }
 
-    async createLesson(lessonData: CreateLessonDTO): Promise<void>{
-        await invoke("create_lesson", {
-            lesson:{
-                ...lessonData, 
+    async createLesson(lessonData: CreateLessonDTO): Promise<void> {
+        // Use invokeWithAuth to ensure accessToken is sent; backend uses serde aliasing
+        // to map camelCase to snake_case where needed.
+        await this.invokeWithAuth<unknown>("create_lesson", {
+            lesson: {
+                module_id: lessonData.module_id,
+                title: lessonData.title,
+                lessonType: lessonData.lessonType,
+                content: lessonData.content,
+                xpReward: lessonData.xpReward,
+                orderIndex: lessonData.orderIndex ?? 0,
                 isLocked: lessonData.isLocked ?? false,
-            }
-        })
+                description: lessonData.description,
+                language: lessonData.language,
+                estimatedMinutes: lessonData.estimatedMinutes,
+            },
+        });
     }
 
     async updateLesson(lessonId: string, updates: {

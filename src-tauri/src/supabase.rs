@@ -318,6 +318,48 @@ impl SupabaseClient {
             Err(error_text)
         }
     }
+
+    pub async fn rest_request<T: for<'de> Deserialize<'de>>(
+        &self,
+        method: reqwest::Method,
+        endpoint: &str,
+        access_token: &str,
+        body: Option<serde_json::Value>,
+    ) -> Result<T, String> {
+        let url = format!("{}/rest/v1/{}", self.url, endpoint);
+
+        let mut request = self.client
+            .request(method, &url)
+            .header("apikey", &self.anon_key)
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Content-Type", "application/json");
+
+        if body.is_some() {
+            request = request.header("Prefer", "return=representation");
+        }
+
+        if let Some(json_body) = body {
+            request = request.json(&json_body);
+        }
+
+        let response = request
+            .send()
+            .await
+            .map_err(|e| format!("Network error: {}", e))?;
+
+        if response.status().is_success() {
+            response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse response: {}", e))
+        } else {
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+            Err(error_text)
+        }
+    }
 }
 
 pub fn get_supabase_config() -> Result<(String, String), String> {
@@ -329,10 +371,6 @@ pub fn get_supabase_config() -> Result<(String, String), String> {
 
     Ok((url, anon_key))
 }
-
-//============================================
-// DATA STRUCTURES FOR LESSONS/COURSES
-//============================================
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -350,7 +388,6 @@ pub struct Course {
     pub icon_url: Option<String>,
 }
 
-// Raw course data from database (without nested modules)
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct CourseRow {
@@ -366,7 +403,6 @@ pub struct CourseRow {
     pub icon_url: Option<String>,
 }
 
-// For creating courses (no id/modules required)
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateCourseInput {
     pub title: String,
@@ -395,7 +431,6 @@ pub struct Module {
     pub icon_emoji: Option<String>,
 }
 
-// Raw module data from database (without nested lessons)
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct ModuleRow {
@@ -407,7 +442,6 @@ pub struct ModuleRow {
     pub icon_emoji: Option<String>,
 }
 
-// For creating modules (no id/lessons required)
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateModuleInput {
     pub course_id: String,
@@ -434,7 +468,6 @@ pub struct Lesson {
     pub estimated_minutes: Option<i32>,
 }
 
-// For creating lessons (no id required)
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateLessonInput {
     pub module_id: String,
@@ -454,9 +487,6 @@ pub struct CreateLessonInput {
     pub estimated_minutes: Option<i32>,
 }
 
-//============================================
-// TAURI COMMANDS FOR COURSES/MODULES/LESSONS
-//============================================
 
 fn get_supabase_client() -> Result<SupabaseClient, String> {
     let (url, anon_key) = get_supabase_config()?;
@@ -466,79 +496,32 @@ fn get_supabase_client() -> Result<SupabaseClient, String> {
 #[tauri::command]
 pub async fn get_all_courses(access_token: String) -> Result<Vec<Course>, String> {
     let client = get_supabase_client()?;
-    
-    let url = format!(
-        "{}/rest/v1/courses?select=*,modules(*,lessons(*))&is_published=eq.true&order=order_index",
-        client.url
-    );
-
-    let response = client.client
-        .get(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
-
-    if response.status().is_success() {
-        let courses: Vec<Course> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse courses: {}", e))?;
-        Ok(courses)
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Supabase error: {}", error_text))
-    }
+    client.rest_request(
+        reqwest::Method::GET,
+        "courses?select=*,modules(*,lessons(*))&is_published=eq.true&order=order_index",
+        &access_token,
+        None,
+    ).await
 }
 
 #[tauri::command]
 pub async fn get_lesson_by_id(lesson_id: String, access_token: String) -> Result<Lesson, String> {
     let client = get_supabase_client()?;
-    
-    let url = format!(
-        "{}/rest/v1/lessons?select=*&id=eq.{}",
-        client.url, lesson_id
-    );
+    let lessons: Vec<Lesson> = client.rest_request(
+        reqwest::Method::GET,
+        &format!("lessons?select=*&id=eq.{}", lesson_id),
+        &access_token,
+        None,
+    ).await?;
 
-    let response = client.client
-        .get(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
-
-    if response.status().is_success() {
-        let lessons: Vec<Lesson> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse lesson: {}", e))?;
-
-        lessons
-            .into_iter()
-            .next()
-            .ok_or_else(|| format!("Lesson {} not found", lesson_id))
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Supabase error: {}", error_text))
-    }
+    lessons.into_iter().next()
+        .ok_or_else(|| format!("Lesson {} not found", lesson_id))
 }
 
 #[tauri::command]
 pub async fn create_course(course: CreateCourseInput, access_token: String) -> Result<Course, String> {
     let client = get_supabase_client()?;
     
-    let url = format!("{}/rest/v1/courses", client.url);
-
     let body = json!({
         "title": course.title,
         "description": course.description,
@@ -551,57 +534,35 @@ pub async fn create_course(course: CreateCourseInput, access_token: String) -> R
         "icon_url": course.icon_url,
     });
 
-    let response = client.client
-        .post(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .header("Prefer", "return=representation")
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
+    let course_rows: Vec<CourseRow> = client.rest_request(
+        reqwest::Method::POST,
+        "courses",
+        &access_token,
+        Some(body),
+    ).await?;
 
-    if response.status().is_success() {
-        let course_rows: Vec<CourseRow> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse response: {}", e))?;
+    let course_row = course_rows.into_iter().next()
+        .ok_or_else(|| "No course returned".to_string())?;
 
-        let course_row = course_rows
-            .into_iter()
-            .next()
-            .ok_or_else(|| "No course returned".to_string())?;
-
-        // Convert CourseRow to Course with empty modules
-        Ok(Course {
-            id: course_row.id,
-            title: course_row.title,
-            description: course_row.description,
-            difficulty: course_row.difficulty,
-            language: course_row.language,
-            modules: Vec::new(), // Empty initially
-            color: course_row.color,
-            order_index: course_row.order_index,
-            is_published: course_row.is_published,
-            estimated_hours: course_row.estimated_hours,
-            icon_url: course_row.icon_url,
-        })
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Failed to create course: {}", error_text))
-    }
+    Ok(Course {
+        id: course_row.id,
+        title: course_row.title,
+        description: course_row.description,
+        difficulty: course_row.difficulty,
+        language: course_row.language,
+        modules: Vec::new(),
+        color: course_row.color,
+        order_index: course_row.order_index,
+        is_published: course_row.is_published,
+        estimated_hours: course_row.estimated_hours,
+        icon_url: course_row.icon_url,
+    })
 }
 
 #[tauri::command]
 pub async fn create_module(module: CreateModuleInput, access_token: String) -> Result<Module, String> {
     let client = get_supabase_client()?;
     
-    let url = format!("{}/rest/v1/modules", client.url);
-
     let body = json!({
         "course_id": module.course_id,
         "title": module.title,
@@ -610,53 +571,31 @@ pub async fn create_module(module: CreateModuleInput, access_token: String) -> R
         "icon_emoji": module.icon_emoji,
     });
 
-    let response = client.client
-        .post(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .header("Prefer", "return=representation")
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
+    let module_rows: Vec<ModuleRow> = client.rest_request(
+        reqwest::Method::POST,
+        "modules",
+        &access_token,
+        Some(body),
+    ).await?;
 
-    if response.status().is_success() {
-        let module_rows: Vec<ModuleRow> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse response: {}", e))?;
+    let module_row = module_rows.into_iter().next()
+        .ok_or_else(|| "No module returned".to_string())?;
 
-        let module_row = module_rows
-            .into_iter()
-            .next()
-            .ok_or_else(|| "No module returned".to_string())?;
-
-        // Convert ModuleRow to Module with empty lessons
-        Ok(Module {
-            id: module_row.id,
-            course_id: module_row.course_id,
-            title: module_row.title,
-            description: module_row.description,
-            lessons: Vec::new(), // Empty initially
-            order_index: module_row.order_index,
-            icon_emoji: module_row.icon_emoji,
-        })
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Failed to create module: {}", error_text))
-    }
+    Ok(Module {
+        id: module_row.id,
+        course_id: module_row.course_id,
+        title: module_row.title,
+        description: module_row.description,
+        lessons: Vec::new(),
+        order_index: module_row.order_index,
+        icon_emoji: module_row.icon_emoji,
+    })
 }
 
 #[tauri::command]
 pub async fn create_lesson(lesson: CreateLessonInput, access_token: String) -> Result<Lesson, String> {
     let client = get_supabase_client()?;
     
-    let url = format!("{}/rest/v1/lessons", client.url);
-
     let body = json!({
         "module_id": lesson.module_id,
         "title": lesson.title,
@@ -670,34 +609,15 @@ pub async fn create_lesson(lesson: CreateLessonInput, access_token: String) -> R
         "estimated_minutes": lesson.estimated_minutes,
     });
 
-    let response = client.client
-        .post(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .header("Prefer", "return=representation")
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
+    let lessons: Vec<Lesson> = client.rest_request(
+        reqwest::Method::POST,
+        "lessons",
+        &access_token,
+        Some(body),
+    ).await?;
 
-    if response.status().is_success() {
-        let lessons: Vec<Lesson> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse response: {}", e))?;
-
-        lessons
-            .into_iter()
-            .next()
-            .ok_or_else(|| "No lesson returned".to_string())
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Failed to create lesson: {}", error_text))
-    }
+    lessons.into_iter().next()
+        .ok_or_else(|| "No lesson returned".to_string())
 }
 
 #[tauri::command]
@@ -708,59 +628,37 @@ pub async fn update_lesson(
 ) -> Result<Lesson, String> {
     let client = get_supabase_client()?;
     
-    let url = format!("{}/rest/v1/lessons?id=eq.{}", client.url, lesson_id);
+    let lessons: Vec<Lesson> = client.rest_request(
+        reqwest::Method::PATCH,
+        &format!("lessons?id=eq.{}", lesson_id),
+        &access_token,
+        Some(updates),
+    ).await?;
 
-    let response = client.client
-        .patch(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Content-Type", "application/json")
-        .header("Prefer", "return=representation")
-        .json(&updates)
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
-
-    if response.status().is_success() {
-        let lessons: Vec<Lesson> = response
-            .json()
-            .await
-            .map_err(|e| format!("Failed to parse response: {}", e))?;
-
-        lessons
-            .into_iter()
-            .next()
-            .ok_or_else(|| "No lesson returned".to_string())
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Failed to update lesson: {}", error_text))
-    }
+    lessons.into_iter().next()
+        .ok_or_else(|| "No lesson returned".to_string())
 }
 
 #[tauri::command]
 pub async fn delete_lesson(lesson_id: String, access_token: String) -> Result<(), String> {
     let client = get_supabase_client()?;
-    
-    let url = format!("{}/rest/v1/lessons?id=eq.{}", client.url, lesson_id);
+    let _: serde_json::Value = client.rest_request(
+        reqwest::Method::DELETE,
+        &format!("lessons?id=eq.{}", lesson_id),
+        &access_token,
+        None,
+    ).await?;
+    Ok(())
+}
 
-    let response = client.client
-        .delete(&url)
-        .header("apikey", &client.anon_key)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .send()
-        .await
-        .map_err(|e| format!("Network error: {}", e))?;
-
-    if response.status().is_success() {
-        Ok(())
-    } else {
-        let error_text = response
-            .text()
-            .await
-            .unwrap_or_else(|_| "Unknown error".to_string());
-        Err(format!("Failed to delete lesson: {}", error_text))
-    }
+#[tauri::command]
+pub async fn delete_course(course_id: String, access_token: String) -> Result<(), String> {
+    let client = get_supabase_client()?;
+    let _: serde_json::Value = client.rest_request(
+        reqwest::Method::DELETE,
+        &format!("courses?id=eq.{}", course_id),
+        &access_token,
+        None,
+    ).await?;
+    Ok(())
 }
