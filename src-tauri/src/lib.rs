@@ -253,7 +253,14 @@ pub fn run() {
             register_user,
             google_sign_in,
             check_is_admin,
-            validate_code
+            validate_code,
+            supabase::get_all_courses,
+            supabase::get_lesson_by_id,
+            supabase::create_course,
+            supabase::create_module,
+            supabase::create_lesson,
+            supabase::update_lesson,
+            supabase::delete_lesson
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

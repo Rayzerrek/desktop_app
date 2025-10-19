@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import CodeEditor from "./CodeEditor";
 import LessonSuccessModal from "./LessonSuccessModal";
-import { getLessonById, allCourses } from "../data/sampleLessons";
+import { lessonService } from "../services/LessonService";
+import { Lesson, Course } from "../types/lesson";
 
 interface CodeValidationResponse {
    success: boolean;
@@ -24,23 +25,54 @@ export default function LessonDemo({
    const [output, setOutput] = useState<string>("");
    const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
    const [showSuccessModal, setShowSuccessModal] = useState(false);
+   const [lesson, setLesson] = useState<Lesson | null>(null);
+   const [course, setCourse] = useState<Course | null>(null);
+   const [loading, setLoading] = useState(true);
 
-   console.log("LessonDemo - Received lessonId:", lessonId);
-   const lesson = getLessonById(lessonId);
-   console.log(
-      "LessonDemo - Found lesson:",
-      lesson?.title,
-      "Language:",
-      lesson?.language,
-   );
+   useEffect(() => {
+      loadLesson();
+   }, [lessonId]);
 
-   if (!lesson) {
-      return <div>Lesson not found</div>;
+   const loadLesson = async () => {
+      try {
+         const lessonData = await lessonService.getLessonById(lessonId);
+         setLesson(lessonData);
+
+         if (lessonData) {
+            const courses = await lessonService.getCourses();
+            const foundCourse = courses.find((c) =>
+               c.modules.some((m) => m.lessons.some((l) => l.id === lessonId))
+            );
+            setCourse(foundCourse || null);
+         }
+      } catch (error) {
+         console.error("Error loading lesson:", error);
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   if (loading) {
+      return (
+         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+            <div className="text-center">
+               <div className="text-6xl mb-4 animate-spin">⏳</div>
+               <p className="text-xl text-slate-600">Ładowanie lekcji...</p>
+            </div>
+         </div>
+      );
    }
 
-   const course = allCourses.find((c) =>
-      c.modules.some((m) => m.lessons.some((l) => l.id === lessonId)),
-   );
+   if (!lesson) {
+      return (
+         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+            <div className="text-center">
+               <div className="text-6xl mb-4">❌</div>
+               <p className="text-xl text-slate-600">Lekcja nie znaleziona</p>
+            </div>
+         </div>
+      );
+   }
 
    const starterCode =
       lesson.content.type === "exercise" ? lesson.content.starterCode : "";
@@ -115,7 +147,7 @@ export default function LessonDemo({
             isOpen={showSuccessModal}
             onClose={() => setShowSuccessModal(false)}
             onNextLesson={handleNextLesson}
-            xpReward={lesson.xpReward}
+            xpReward={lesson.xp_reward}
             lessonTitle={lesson.title}
          />
          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
@@ -146,24 +178,19 @@ export default function LessonDemo({
                      </div>
 
                      {lesson.content.type === "exercise" &&
-                        lesson.content.solution && (
+                        lesson.content.exampleCode && (
                            <div className="bg-gray-900 rounded-lg p-4">
+                              {lesson.content.exampleDescription && (
+                                 <p className="text-sm text-gray-300 mb-3">
+                                    {lesson.content.exampleDescription}
+                                 </p>
+                              )}
                               <p className="text-xs text-gray-400 mb-2">
-                                 Przykład:
+                                 Przykładowy kod:
                               </p>
                               <pre className="text-green-400 font-mono text-sm">
-                                 <code>{lesson.content.solution}</code>
+                                 <code>{lesson.content.exampleCode}</code>
                               </pre>
-                              {expectedOutput && (
-                                 <>
-                                    <p className="text-xs text-gray-400 mt-2">
-                                       Wynik:
-                                    </p>
-                                    <pre className="text-white font-mono text-sm">
-                                       <code>{expectedOutput}</code>
-                                    </pre>
-                                 </>
-                              )}
                            </div>
                         )}
                         
@@ -193,7 +220,7 @@ export default function LessonDemo({
                            Nagroda za ukończenie:
                         </span>
                         <span className="text-2xl font-bold text-yellow-600">
-                           +{lesson.xpReward} XP
+                           +{lesson.xp_reward} XP
                         </span>
                      </div>
                   </div>

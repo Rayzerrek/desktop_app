@@ -5,7 +5,7 @@ import LessonDemo from "./components/LessonDemo";
 import CourseDashboard from "./components/CourseDashboard";
 import AdminPanel from "./components/AdminPanel";
 import Toast, { ToastType } from "./components/Toast";
-import { allCourses } from "./data/sampleLessons";
+import { lessonService } from "./services/LessonService";
 import "./styles/App.css";
 
 function App() {
@@ -55,7 +55,7 @@ function App() {
       }
    }, [currentView]);
 
-   const handleCourseSelect = (courseId: string) => {
+   const handleCourseSelect = async (courseId: string) => {
       console.log("Selected course ID:", courseId);
 
       if (courseId === selectedCourseId) {
@@ -65,18 +65,26 @@ function App() {
 
       setSelectedCourseId(courseId);
 
-      const course = allCourses.find((c) => c.id === courseId);
-      console.log("Found course:", course?.title);
+      try {
+         const courses = await lessonService.getCourses();
+         const course = courses.find((c) => c.id === courseId);
+         console.log("Found course:", course?.title);
 
-      if (course && course.modules[0]?.lessons[0]) {
-         const firstLessonId = course.modules[0].lessons[0].id;
-         console.log("First lesson ID:", firstLessonId);
-         setSelectedLessonId(firstLessonId);
-      } else {
-         console.error("No lessons found in course!");
+         if (course && course.modules[0]?.lessons[0]) {
+            const firstLessonId = course.modules[0].lessons[0].id;
+            console.log("First lesson ID:", firstLessonId);
+            setSelectedLessonId(firstLessonId);
+            setCurrentView("lesson");
+         } else {
+            console.error("No lessons found in course!");
+         }
+      } catch (error) {
+         console.error("Error loading course:", error);
+         setToast({
+            message: "Błąd ładowania kursu",
+            type: "error"
+         });
       }
-
-      setCurrentView("lesson");
    };
 
    const handleAdminAccess = () => {
@@ -133,14 +141,19 @@ function App() {
                   onClose={() => setToast(null)}
                />
             )}
-            <button
-               onClick={() => {
-                  setCurrentView("auth");
-               }}
-               className="fixed bottom-4 left-4 z-50 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition shadow-lg text-sm"
-            >
-               ← Powrót do logowania (DEV)
-            </button>
+            <div className="fixed bottom-4 left-4 z-50">
+               <button
+                  onClick={() => {
+                     localStorage.removeItem("access_token");
+                     localStorage.removeItem("refresh_token");
+                     localStorage.removeItem("user_id");
+                     window.location.reload();
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
+               >
+                  🚪 Wyloguj
+               </button>
+            </div>
             <button
                onClick={handleAdminAccess}
                className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-sm flex items-center gap-2"
@@ -150,7 +163,7 @@ function App() {
                      : "Brak dostępu (tylko DEV test)"
                }
             >
-               🔧 Panel Admina {!isAdmin && "(TEST)"}
+               Panel Admina {!isAdmin && "(TEST)"}
             </button>
             <CourseDashboard onCourseSelect={handleCourseSelect} />
          </div>

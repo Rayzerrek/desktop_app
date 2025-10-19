@@ -7,14 +7,15 @@ const pythonLesson1: Lesson = {
    description: "Naucz się wyświetlać tekst w konsoli",
    lessonType: "exercise",
    language: "python",
-   xpReward: 10,
+   xp_reward: 10,
    orderIndex: 1,
    estimatedMinutes: 5,
    content: {
       type: "exercise",
       instruction: "Napisz kod, który wyświetli w konsoli tekst: Witaj świecie",
-      starterCode:
-         '# Napisz kod, który wypisze "Witaj świecie"',
+      exampleCode: 'print("Cześć!")',
+      exampleDescription: "Przykład: Tak możesz wyświetlić słowo 'Cześć!' w konsoli",
+      starterCode: '# Napisz kod, który wypisze "Witaj świecie"\n',
       solution: 'print("Witaj świecie")',
       hint: "Użyj funkcji print() i umieść tekst w cudzysłowie",
       testCases: [
@@ -26,27 +27,28 @@ const pythonLesson1: Lesson = {
    },
 };
 
-// Python - Lesson 2: Variables
 const pythonLesson2: Lesson = {
    id: "py-002",
    title: "Zmienne w Pythonie",
    description: "Poznaj podstawy zmiennych",
    lessonType: "exercise",
    language: "python",
-   xpReward: 15,
+   xp_reward: 15,
    orderIndex: 2,
    estimatedMinutes: 8,
    content: {
       type: "exercise",
       instruction:
-         "Stwórz zmienną 'name' z wartością 'Python' i wyświetl ją używając print()",
-      starterCode: "# Stwórz zmienną name i wyświetl ją\n",
-      solution: 'name = "Python"\nprint(name)',
+         "Stwórz zmienną 'imie' z wartością 'Anna' i wyświetl ją używając print()",
+      exampleCode: 'wiek = 25\nprint(wiek)',
+      exampleDescription: "Przykład: Tak możesz stworzyć zmienną 'wiek' i ją wyświetlić",
+      starterCode: "# Stwórz zmienną imie z wartością 'Anna' i wyświetl ją\n",
+      solution: 'imie = "Anna"\nprint(imie)',
       hint: "Pamiętaj: nazwa_zmiennej = wartość, potem print(nazwa_zmiennej)",
       testCases: [
          {
-            expectedOutput: "Python",
-            description: "Program powinien wyświetlić: Python",
+            expectedOutput: "Anna",
+            description: "Program powinien wyświetlić: Anna",
          },
       ],
    },
@@ -59,7 +61,7 @@ const pythonLesson3: Lesson = {
    description: "Sprawdź swoją wiedzę",
    lessonType: "quiz",
    language: "python",
-   xpReward: 10,
+   xp_reward: 10,
    orderIndex: 3,
    estimatedMinutes: 3,
    content: {
@@ -98,18 +100,20 @@ const pythonLesson4: Lesson = {
    lessonType: "exercise",
    description:"Pętla for jest używana do iteracji po elementach sekwencji. Funkcja range() tworzy sekwencję liczb całkowitych.",
    language: "python",
-   xpReward: 20,
+   xp_reward: 20,
    orderIndex: 4,
    estimatedMinutes: 10,
    content: {
       type: "exercise",
-      starterCode: "# Twój kod \n",
-      instruction:"Stwórz pętlę for, która wyświetli liczby od 0 do 4.",
+      exampleCode: "for i in range(3):\n    print(i)",
+      exampleDescription: "Przykład: Ta pętla wyświetli liczby 0, 1, 2",
+      starterCode: "# Stwórz pętlę for, która wyświetli liczby od 0 do 4\n",
+      instruction:"Stwórz pętlę for, która wyświetli liczby od 0 do 4 (każda w nowej linii).",
       solution: "for i in range(5):\n    print(i)",
       testCases:[
          {
-            expectedOutput: "0\n1\n2\n3\n4\n",
-            description: "Program powinien wyświetlić: 0\n1\n2\n3\n4\n",
+            expectedOutput: "0\n1\n2\n3\n4",
+            description: "Program powinien wyświetlić liczby od 0 do 4, każda w nowej linii",
          },
       ]
    },
@@ -121,13 +125,15 @@ const jsLesson1: Lesson = {
    description: "Wyświetl swoją pierwszą wiadomość",
    lessonType: "exercise",
    language: "javascript",
-   xpReward: 10,
+   xp_reward: 10,
    orderIndex: 1,
    estimatedMinutes: 5,
    content: {
       type: "exercise",
       instruction:
          'Użyj console.log() aby wyświetlić tekst: "Hello JavaScript"',
+      exampleCode: 'console.log("Witaj!");',
+      exampleDescription: "Przykład: Tak możesz wyświetlić 'Witaj!' w konsoli",
       starterCode: '// Wyświetl "Hello JavaScript"\n',
       solution: 'console.log("Hello JavaScript");',
       testCases: [
@@ -146,7 +152,7 @@ const jsLesson2: Lesson = {
    description: "Naucz się deklarować zmienne",
    lessonType: "exercise",
    language: "javascript",
-   xpReward: 15,
+   xp_reward: 15,
    orderIndex: 2,
    estimatedMinutes: 8,
    content: {
@@ -172,7 +178,7 @@ const htmlLesson1: Lesson = {
    description: "Naucz się tworzyć nagłówki",
    lessonType: "exercise",
    language: "html",
-   xpReward: 10,
+   xp_reward: 10,
    orderIndex: 1,
    estimatedMinutes: 5,
    content: {
@@ -254,8 +260,19 @@ export const htmlCourse: Course = {
    isPublished: true,
    modules: [htmlModule1],
 };
+export const typescriptCourse:Course = {
+   id:"course-typescript",
+   title:"TypeScript: typowanie w JavaScript",
+   description:"Naucz się używać TypeScript do tworzenia bezpieczniejszego kodu",
+   difficulty:"intermediate",
+   language:"typescript",
+   color:"#3178C6",
+   estimatedHours:15,
+   isPublished:true,
+   modules:[],
+}
 
-export const allCourses: Course[] = [pythonCourse, jsCourse, htmlCourse];
+export const allCourses: Course[] = [pythonCourse, jsCourse, htmlCourse, typescriptCourse];
 
 export const getAllLessons = (courseId: string): Lesson[] => {
    const course = allCourses.find((c) => c.id === courseId);

@@ -45,6 +45,7 @@ CREATE TABLE courses (
   title TEXT NOT NULL,
   description TEXT,
   difficulty TEXT CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')) DEFAULT 'beginner',
+  language TEXT NOT NULL DEFAULT 'python', -- Programming language (python, javascript, typescript, etc.)
   icon_url TEXT,
   color TEXT DEFAULT '#3B82F6',
   order_index INTEGER NOT NULL,
@@ -62,6 +63,7 @@ CREATE TABLE modules (
   course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
+  icon_emoji TEXT, -- Emoji icon for the module
   order_index INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -74,11 +76,14 @@ CREATE TABLE lessons (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
+  description TEXT, -- Brief description of the lesson
   lesson_type TEXT CHECK (lesson_type IN ('theory', 'exercise', 'quiz', 'project')) NOT NULL,
   content JSONB NOT NULL DEFAULT '{}'::jsonb,
+  language TEXT NOT NULL DEFAULT 'python', -- Programming language for this lesson
   xp_reward INTEGER DEFAULT 10,
   order_index INTEGER NOT NULL,
   is_locked BOOLEAN DEFAULT false,
+  estimated_minutes INTEGER, -- Estimated time to complete in minutes
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

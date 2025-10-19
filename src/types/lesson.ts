@@ -18,6 +18,8 @@ export interface ExerciseLesson {
    starterCode: string;
    solution: string;
    hint?: string;
+   exampleCode?: string; // Kod przykładowy pokazujący podobną koncepcję
+   exampleDescription?: string; // Opis co robi kod przykładowy
    testCases?: {
       input?: string;
       expectedOutput: string;
@@ -60,7 +62,7 @@ export interface Lesson {
    lessonType: LessonType;
    content: LessonContent;
    language: "python" | "javascript" | "html" | "css" | "typescript";
-   xpReward: number;
+   xp_reward: number;
    orderIndex: number;
    isLocked?: boolean;
    estimatedMinutes?: number;

@@ -1,5 +1,8 @@
-import { allCourses } from "../data/sampleLessons";
 import { Course } from "../types/lesson";
+import { lessonService } from "../services/LessonService";
+import { JSX, useEffect, useState } from "react";
+import { SiPython, SiJavascript, SiHtml5, SiCss3, SiTypescript} from "react-icons/si";
+import { DiJava } from "react-icons/di";
 
 interface CourseDashboardProps {
    onCourseSelect: (courseId: string) => void;
@@ -8,15 +11,34 @@ interface CourseDashboardProps {
 export default function CourseDashboard({
    onCourseSelect,
 }: CourseDashboardProps) {
+   const [courses, setCourses] = useState<Course[]>([]);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+      loadCourses();
+   }, []);
+
+   const loadCourses = async () => {
+      try {
+         const data = await lessonService.getCourses();
+         setCourses(data);
+      } catch (error) {
+         console.error("Error loading courses:", error);
+      } finally {
+         setLoading(false);
+      }
+   };
    const getCourseIcon = (language: string) => {
-      const icons: Record<string, string> = {
-         python: "🐍",
-         javascript: "📜",
-         html: "🌐",
-         css: "🎨",
-         typescript: "📘",
+      const icons: Record<string, JSX.Element> = {
+         python: <SiPython />,
+         javascript: <SiJavascript />,
+         html: <SiHtml5 />,
+         css: <SiCss3 />,
+         typescript: <SiTypescript />,
+         java: <DiJava />,
+         
       };
-      return icons[language] || "📚";
+      return icons[language] || "";
    };
 
    const getDifficultyColor = (difficulty: string) => {
@@ -37,6 +59,17 @@ export default function CourseDashboard({
       return labels[difficulty] || difficulty;
    };
 
+   if (loading) {
+      return (
+         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+            <div className="text-center">
+               <div className="text-6xl mb-4 animate-bounce">📚</div>
+               <p className="text-xl text-slate-600">Ładowanie kursów...</p>
+            </div>
+         </div>
+      );
+   }
+
    return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,7 +84,7 @@ export default function CourseDashboard({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {allCourses.map((course: Course) => (
+               {courses.map((course: Course) => (
                   <div
                      key={course.id}
                      onClick={() => onCourseSelect(course.id)}
