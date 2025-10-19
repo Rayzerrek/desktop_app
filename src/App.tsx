@@ -1,59 +1,33 @@
 import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import AuthPanel from "./components/AuthPanel";
 import LessonDemo from "./components/LessonDemo";
 import CourseDashboard from "./components/CourseDashboard";
 import AdminPanel from "./components/AdminPanel";
 import Toast, { ToastType } from "./components/Toast";
 import { lessonService } from "./services/LessonService";
+import { useAuth } from "./hooks/useAuth";
 import "./styles/App.css";
 
 function App() {
+
+   const {isAuthenticated, isAdmin, refreshAdmin, logout} = useAuth();
    const [currentView, setCurrentView] = useState<
       "auth" | "dashboard" | "lesson" | "admin"
    >("auth");
    const [selectedCourseId, setSelectedCourseId] = useState<string>("");
    const [selectedLessonId, setSelectedLessonId] = useState<string>("");
-   const [isAdmin, setIsAdmin] = useState<boolean>(false);
    const [toast, setToast] = useState<{
       message: string;
       type: ToastType;
    } | null>(null);
 
-   const checkAuth = () => {
-      const token = localStorage.getItem("access_token");
-      return !!token;
-   };
 
-   const checkAdminStatus = async () => {
-      const token = localStorage.getItem("access_token");
-      console.log("🔍 Checking admin status...");
-      console.log("Token exists:", !!token);
-
-      if (!token) {
-         console.log("❌ No token found");
-         setIsAdmin(false);
-         return;
-      }
-
-      try {
-         console.log("📞 Calling check_is_admin...");
-         const isAdminUser = await invoke<boolean>("check_is_admin", {
-            accessToken: token,
-         });
-         console.log("✅ Admin check result:", isAdminUser);
-         setIsAdmin(isAdminUser);
-      } catch (error) {
-         console.error("❌ Failed to check admin status:", error);
-         setIsAdmin(false);
-      }
-   };
 
    useEffect(() => {
-      if (checkAuth()) {
-         checkAdminStatus();
+      if (isAuthenticated) {
+         refreshAdmin();
       }
-   }, [currentView]);
+   }, [isAuthenticated, refreshAdmin, currentView]);
 
    const handleCourseSelect = async (courseId: string) => {
       console.log("Selected course ID:", courseId);
@@ -88,7 +62,7 @@ function App() {
    };
 
    const handleAdminAccess = () => {
-      if (!checkAuth()) {
+      if (!isAuthenticated) {
          setToast({
             message:
                "Musisz być zalogowany aby uzyskać dostęp do panelu admina",
@@ -144,10 +118,7 @@ function App() {
             <div className="fixed bottom-4 left-4 z-50">
                <button
                   onClick={() => {
-                     localStorage.removeItem("access_token");
-                     localStorage.removeItem("refresh_token");
-                     localStorage.removeItem("user_id");
-                     window.location.reload();
+                     logout();
                   }}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
                >
@@ -193,15 +164,12 @@ function App() {
       );
    }
 
-   if (checkAuth()) {
+   if (isAuthenticated) {
       return (
          <div>
             <button
                onClick={() => {
-                  localStorage.removeItem("access_token");
-                  localStorage.removeItem("refresh_token");
-                  localStorage.removeItem("user_id");
-                  window.location.reload();
+                  logout();
                }}
                className="fixed bottom-4 left-4 z-50 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
             >
@@ -216,7 +184,6 @@ function App() {
       <div>
          <button
             onClick={() => {
-               // Dev mode: set fake token to skip auth
                localStorage.setItem("access_token", "dev_token_skip_auth");
                localStorage.setItem("user_id", "dev_user");
                setCurrentView("dashboard");

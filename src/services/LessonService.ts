@@ -1,35 +1,33 @@
 import { invoke } from "@tauri-apps/api/core";
 import { allCourses } from "../data/sampleLessons";
-import { Course, Lesson, Module, LessonContent } from "../types/lesson";
+import { Course, Lesson, Module, LessonContent, Difficulty, LessonType, CreateCourseDTO, CreateModuleDTO, CreateLessonDTO } from "../types/lesson";
 
 export class LessonService {
-    private cache: Map<string, Course> = new Map();
+    private cache = new Map<string, Course>();
+
+
+
 
     async getCourses(refresh = false): Promise<Course[]> {
         if (!refresh && this.cache.size > 0) {
             return Array.from(this.cache.values());
         }
 
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            console.warn("No access token, using local data");
+            return allCourses;
+        }
+
         try {
-            const token = localStorage.getItem("access_token");
-            if (!token) {
-                console.warn("No access token, using local data");
-                return allCourses;
-            }
-
-            const courses = await invoke<Course[]>("get_all_courses", {
-                accessToken: token
-            });
-
-            // Update cache
+            const courses = await invoke<Course[]>("get_all_courses", { accessToken: token });
+            
             this.cache.clear();
-            for (const course of courses) {
-                this.cache.set(course.id, course);
-            }
+            courses.forEach(course => this.cache.set(course.id, course));
 
             return courses;
         } catch (error) {
-            console.warn("Failed to fetch courses from database, falling back to local lessons", error);
+            console.warn("Failed to fetch courses, falling back to local data:", error);
             return allCourses;
         }
     }
@@ -54,16 +52,9 @@ export class LessonService {
     }
 
     private findLessonLocally(lessonId: string): Lesson | null {
-        // Search in cache first
-        for (const course of this.cache.values()) {
-            for (const module of course.modules) {
-                const lesson = module.lessons.find(l => l.id === lessonId);
-                if (lesson) return lesson;
-            }
-        }
-
-        // Search in fallback data
-        for (const course of allCourses) {
+        const sources = [...this.cache.values(), ...allCourses];
+        
+        for (const course of sources) {
             for (const module of course.modules) {
                 const lesson = module.lessons.find(l => l.id === lessonId);
                 if (lesson) return lesson;
@@ -73,99 +64,47 @@ export class LessonService {
         return null;
     }
 
-    async createCourse(courseData: {
-        title: string;
-        description: string;
-        difficulty: "beginner" | "intermediate" | "advanced";
-        language: string;
-        color: string;
-        isPublished: boolean;
-        estimatedHours?: number;
-        iconUrl?: string;
-    }): Promise<Course> {
-        const token = this.getTokenOrThrow();
-
-        const course = await invoke<Course>("create_course", {
+    async createCourse(courseData: CreateCourseDTO): Promise<Course> {
+        return this.invokeWithAuth<Course>("create_course", {
             course: {
                 title: courseData.title,
                 description: courseData.description,
                 difficulty: courseData.difficulty,
                 language: courseData.language,
                 color: courseData.color,
-                order_index: 0, // Default
+                order_index: 0,
                 is_published: courseData.isPublished,
                 estimated_hours: courseData.estimatedHours,
                 icon_url: courseData.iconUrl,
-            },
-            accessToken: token
+            }
         });
-
-        this.cache.clear();
-        return course;
     }
 
-    async createModule(moduleData: {
-        course_id: string;
-        title: string;
-        description: string;
-        orderIndex: number;
-        iconEmoji?: string;
-    }): Promise<Module> {
-        const token = this.getTokenOrThrow();
-
-        const module = await invoke<Module>("create_module", {
+    async createModule(moduleData: CreateModuleDTO): Promise<Module> {
+        return this.invokeWithAuth<Module>("create_module", {
             module: {
                 course_id: moduleData.course_id,
                 title: moduleData.title,
                 description: moduleData.description,
                 order_index: moduleData.orderIndex,
                 icon_emoji: moduleData.iconEmoji,
-            },
-            accessToken: token
+            }
         });
-
-        this.cache.clear();
-        return module;
     }
 
-    async createLesson(lessonData: {
-        module_id: string;
-        title: string;
-        description?: string;
-        lessonType: "theory" | "exercise" | "quiz" | "project";
-        content: LessonContent;
-        language: "python" | "javascript" | "html" | "css" | "typescript";
-        xpReward: number;
-        orderIndex: number;
-        isLocked?: boolean;
-        estimatedMinutes?: number;
-    }): Promise<Lesson> {
-        const token = this.getTokenOrThrow();
-
-        const lesson = await invoke<Lesson>("create_lesson", {
-            lesson: {
-                module_id: lessonData.module_id,
-                title: lessonData.title,
-                description: lessonData.description,
-                lessonType: lessonData.lessonType,
-                content: lessonData.content,
-                language: lessonData.language,
-                xpReward: lessonData.xpReward,
-                orderIndex: lessonData.orderIndex,
+    async createLesson(lessonData: CreateLessonDTO): Promise<void>{
+        await invoke("create_lesson", {
+            lesson:{
+                ...lessonData, 
                 isLocked: lessonData.isLocked ?? false,
-                estimatedMinutes: lessonData.estimatedMinutes,
-            },
-            accessToken: token
-        });
-
-        this.cache.clear();
-        return lesson;
+            }
+        })
     }
 
     async updateLesson(lessonId: string, updates: {
         title?: string;
         description?: string;
-        lessonType?: "theory" | "exercise" | "quiz" | "project";
+        lessonType?: LessonType;
         content?: LessonContent;
         language?: "python" | "javascript" | "html" | "css" | "typescript";
         xpReward?: number;
@@ -173,38 +112,20 @@ export class LessonService {
         isLocked?: boolean;
         estimatedMinutes?: number;
     }): Promise<Lesson> {
-        const token = this.getTokenOrThrow();
-
-        const lesson = await invoke<Lesson>("update_lesson", {
-            lessonId,
-            updates,
-            accessToken: token
-        });
-
-        this.cache.clear();
-        return lesson;
+        return this.invokeWithAuth<Lesson>("update_lesson", { lessonId, updates });
     }
 
     async updateCourse(courseId: string, updates: {
         title?: string;
         description?: string;
-        difficulty?: "beginner" | "intermediate" | "advanced";
+        difficulty?: Difficulty;
         language?: string;
         color?: string;
         isPublished?: boolean;
         estimatedHours?: number;
         iconUrl?: string;
     }): Promise<Course> {
-        const token = this.getTokenOrThrow();
-
-        const course = await invoke<Course>("update_course", {
-            courseId,
-            updates,
-            accessToken: token
-        });
-
-        this.cache.clear();
-        return course;
+        return this.invokeWithAuth<Course>("update_course", { courseId, updates });
     }
 
     async updateModule(moduleId: string, updates: {
@@ -213,66 +134,19 @@ export class LessonService {
         orderIndex?: number;
         iconEmoji?: string;
     }): Promise<Module> {
-        const token = this.getTokenOrThrow();
-
-        const module = await invoke<Module>("update_module", {
-            moduleId,
-            updates,
-            accessToken: token
-        });
-
-        this.cache.clear();
-        return module;
+        return this.invokeWithAuth<Module>("update_module", { moduleId, updates });
     }
 
     async deleteLesson(lessonId: string): Promise<void> {
-        const token = this.getTokenOrThrow();
-
-        await invoke("delete_lesson", {
-            lessonId,
-            accessToken: token
-        });
-
-        this.cache.clear();
+        await this.invokeWithAuth<void>("delete_lesson", { lessonId });
     }
 
     async deleteModule(moduleId: string): Promise<void> {
-        const token = this.getTokenOrThrow();
-
-        // TODO: Implement delete_module command in Rust backend
-        await invoke("delete_module", {
-            moduleId,
-            accessToken: token
-        });
-
-        this.cache.clear();
+        await this.invokeWithAuth<void>("delete_module", { moduleId });
     }
 
-    /**
-     * Delete a course and all its modules/lessons
-     * Note: Backend support for this method needs to be added in Rust
-     */
     async deleteCourse(courseId: string): Promise<void> {
-        const token = this.getTokenOrThrow();
-
-        // TODO: Implement delete_course command in Rust backend
-        await invoke("delete_course", {
-            courseId,
-            accessToken: token
-        });
-
-        this.cache.clear();
-    }
-
-    // ============================================
-    // UTILITY METHODS
-    // ============================================
-
-    /**
-     * Clear the memory cache - use after bulk operations
-     */
-    clearCache(): void {
-        this.cache.clear();
+        await this.invokeWithAuth<void>("delete_course", { courseId });
     }
 
     isAuthenticated(): boolean {
@@ -286,6 +160,14 @@ export class LessonService {
         }
         return token;
     }
+
+    private async invokeWithAuth<T>(command: string, params: any): Promise<T> {
+        const token = this.getTokenOrThrow();
+        const result = await invoke<T>(command, { ...params, accessToken: token });
+        this.cache.clear();
+        return result;
+    }
 }
 
 export const lessonService = new LessonService();
+

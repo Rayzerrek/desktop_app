@@ -3,6 +3,7 @@ import { lessonService } from "../services/LessonService";
 import { JSX, useEffect, useState } from "react";
 import { SiPython, SiJavascript, SiHtml5, SiCss3, SiTypescript} from "react-icons/si";
 import { DiJava } from "react-icons/di";
+import { countLessons } from "../utils/courseUtils";
 
 interface CourseDashboardProps {
    onCourseSelect: (courseId: string) => void;
@@ -28,17 +29,16 @@ export default function CourseDashboard({
          setLoading(false);
       }
    };
-   const getCourseIcon = (language: string) => {
-      const icons: Record<string, JSX.Element> = {
+   const getCourseIcon = (language: string): JSX.Element | null => {
+      const courseIcons: Record<string, JSX.Element> = {
          python: <SiPython />,
          javascript: <SiJavascript />,
          html: <SiHtml5 />,
          css: <SiCss3 />,
          typescript: <SiTypescript />,
          java: <DiJava />,
-         
       };
-      return icons[language] || "";
+      return courseIcons[language] || null;
    };
 
    const getDifficultyColor = (difficulty: string) => {
@@ -118,10 +118,7 @@ export default function CourseDashboard({
                         <div className="flex items-center gap-1">
                            <span>📚</span>
                            <span>
-                              {course.modules.reduce(
-                                 (acc, module) => acc + module.lessons.length,
-                                 0
-                              )}{" "}
+                              {countLessons(course)}
                               lekcji
                            </span>
                         </div>

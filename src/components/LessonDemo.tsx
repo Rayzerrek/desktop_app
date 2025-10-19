@@ -4,6 +4,7 @@ import CodeEditor from "./CodeEditor";
 import LessonSuccessModal from "./LessonSuccessModal";
 import { lessonService } from "../services/LessonService";
 import { Lesson, Course } from "../types/lesson";
+import { getNextLessonId, findCourseByLessonId } from "../utils/courseUtils";
 
 interface CodeValidationResponse {
    success: boolean;
@@ -40,9 +41,7 @@ export default function LessonDemo({
 
          if (lessonData) {
             const courses = await lessonService.getCourses();
-            const foundCourse = courses.find((c) =>
-               c.modules.some((m) => m.lessons.some((l) => l.id === lessonId))
-            );
+            const foundCourse = findCourseByLessonId(courses, lessonId);
             setCourse(foundCourse || null);
          }
       } catch (error) {
@@ -122,22 +121,18 @@ export default function LessonDemo({
       }
    };
 
-   const handleNextLesson = () => {
+   const handleNextLesson = async () => {
       setShowSuccessModal(false);
       console.log("Moving to next lesson from:", lessonId);
 
-      // Find next lesson
-      if (course) {
-         const allLessons = course.modules.flatMap((m) => m.lessons);
-         const currentIndex = allLessons.findIndex((l) => l.id === lessonId);
+      const courses = await lessonService.getCourses();
+      const nextId = getNextLessonId(courses, lessonId);
 
-         if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
-            const nextLesson = allLessons[currentIndex + 1];
-            console.log("Next lesson:", nextLesson.id);
-            onNextLesson?.(nextLesson.id);
-         } else {
-            console.log("This is the last lesson!");
-         }
+      if (nextId) {
+         console.log("Next lesson:", nextId);
+         onNextLesson?.(nextId);
+      } else {
+         console.log("This is the last lesson!");
       }
    };
 

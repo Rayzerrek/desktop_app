@@ -1,5 +1,3 @@
-export type LessonType = "theory" | "exercise" | "quiz" | "project";
-
 export interface CodeBlock {
    type: "text" | "code" | "tip" | "warning" | "info";
    content: string;
@@ -18,8 +16,8 @@ export interface ExerciseLesson {
    starterCode: string;
    solution: string;
    hint?: string;
-   exampleCode?: string; // Kod przykładowy pokazujący podobną koncepcję
-   exampleDescription?: string; // Opis co robi kod przykładowy
+   exampleCode?: string; 
+   exampleDescription?: string; 
    testCases?: {
       input?: string;
       expectedOutput: string;
@@ -38,6 +36,36 @@ export interface QuizLesson {
    question: string;
    options: QuizOption[];
    explanation?: string;
+}
+export interface CreateCourseDTO {
+   title: string;
+   description: string;
+   difficulty: Difficulty;
+   language: string;
+   color: string;
+   order_index: 0;
+   isPublished: boolean;
+   estimatedHours?: number;
+   iconUrl?: string;
+}
+export interface CreateModuleDTO {
+   course_id: string;
+   title: string;
+   description: string;
+   orderIndex: number;
+   iconEmoji?: string;
+}
+export interface CreateLessonDTO {
+   module_id: string;
+   title: string;
+   description?: string;
+   lessonType: LessonType;
+   content: LessonContent;
+   language: "python" | "javascript" | "html" | "css" | "typescript";
+   xpReward: number;
+   orderIndex: number;
+   isLocked?: boolean;
+   estimatedMinutes?: number;
 }
 
 export interface ProjectLesson {
@@ -98,6 +126,9 @@ export interface UserProgress {
    completedAt?: string;
    timeSpentSeconds?: number;
 }
+export type Difficulty = "beginner" | "intermediate" | "advanced";
+export type LessonType = "theory" | "exercise" | "quiz" | "project";
+export type Language = "python" | "javascript" | "html" | "css" | "typescript";
 
 export interface UserCourseProgress {
    courseId: string;

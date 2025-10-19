@@ -1,5 +1,6 @@
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
+import { getFileNameForLanguage } from "../utils/courseUtils";
 
 interface CodeEditorProps {
    initialCode?: string;
@@ -54,15 +55,7 @@ export default function CodeEditor({
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                </div>
                <span className="text-sm text-gray-400 font-mono ml-2">
-                  {language === "python"
-                     ? "main.py"
-                     : language === "javascript"
-                       ? "script.js"
-                       : language === "html"
-                         ? "index.html"
-                         : language === "css"
-                           ? "styles.css"
-                           : `code.${language}`}
+                  {getFileNameForLanguage(language)}
                </span>
             </div>
 
