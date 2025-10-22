@@ -162,7 +162,7 @@ export default function LessonDemo({
                   <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6 space-y-6">
                      <div>
                         <h2 className="text-xl font-semibold text-slate-800 mb-3">
-                           📚 Instrukcja
+                           Instrukcja
                         </h2>
                         <div className="prose prose-sm">
                            <p className="text-slate-700 mb-4">
@@ -193,7 +193,7 @@ export default function LessonDemo({
                      {lesson.content.type === "exercise" && (
                         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
                            <h3 className="text-lg font-semibold text-purple-900 mb-2">
-                              🎯 Twoje zadanie
+                              Twoje zadanie
                            </h3>
                            <p className="text-purple-800">
                               {lesson.content.instruction}
@@ -252,7 +252,6 @@ export default function LessonDemo({
                      {isCorrect === false && (
                         <div className="rounded-lg p-5 bg-red-50/80 backdrop-blur-sm border-2 border-red-400">
                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-3xl">❌</span>
                               <h3 className="text-xl font-bold text-red-900">
                                  Nie do końca...
                               </h3>

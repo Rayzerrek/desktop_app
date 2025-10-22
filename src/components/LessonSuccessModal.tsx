@@ -56,7 +56,7 @@ export default function LessonSuccessModal({
 
                <div className="relative mb-4">
                   <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow-lg animate-bounce-once">
-                     <span className="text-6xl">🎉</span>
+                     <span className="text-6xl"></span>
                   </div>
                </div>
 
@@ -89,17 +89,17 @@ export default function LessonSuccessModal({
 
                <div className="grid grid-cols-3 gap-3 mb-6">
                   <div className="bg-blue-50 rounded-lg p-3 text-center">
-                     <div className="text-2xl mb-1">🔥</div>
+                     <div className="text-2xl mb-1"></div>
                      <div className="text-xs text-gray-600">Streak</div>
                      <div className="text-lg font-bold text-blue-600">5</div>
                   </div>
                   <div className="bg-purple-50 rounded-lg p-3 text-center">
-                     <div className="text-2xl mb-1">📚</div>
+                     <div className="text-2xl mb-1"></div>
                      <div className="text-xs text-gray-600">Lekcji</div>
                      <div className="text-lg font-bold text-purple-600">12</div>
                   </div>
                   <div className="bg-green-50 rounded-lg p-3 text-center">
-                     <div className="text-2xl mb-1">⭐</div>
+                     <div className="text-2xl mb-1"></div>
                      <div className="text-xs text-gray-600">Total XP</div>
                      <div className="text-lg font-bold text-green-600">250</div>
                   </div>

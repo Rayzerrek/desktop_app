@@ -76,7 +76,7 @@ function App() {
 
       if (!isAdmin) {
          setToast({
-            message: "Nie masz uprawnień administratora! 🔒",
+            message: "Nie masz uprawnień administratora!",
             type: "error",
          });
          return;
@@ -96,7 +96,7 @@ function App() {
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
                <div className="text-center">
                   <h1 className="text-2xl font-bold text-slate-800">
-                     🔒 Brak dostępu
+                     Brak dostępu
                   </h1>
                   <p className="text-slate-600 mt-2">
                      Tylko administratorzy mogą tutaj wejść
@@ -146,14 +146,14 @@ function App() {
                }}
                className="fixed bottom-4 left-4 z-50 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
             >
-               🚪 Wyloguj
+               Wyloguj
             </button>
             {isAdmin && (
                <button
                   onClick={handleAdminAccess}
                   className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-sm flex items-center gap-2"
                >
-                  🔐 Panel Admina
+                  Panel Admina
                </button>
             )}
             <CourseDashboard onCourseSelect={handleCourseSelect} />
@@ -171,7 +171,7 @@ function App() {
             }}
             className="fixed top-4 right-4 z-50 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-xs font-mono"
          >
-            🚀 DEV: Skip to Dashboard
+            DEV: Skip to Dashboard
          </button>
          <AuthPanel onLoginSuccess={login} />
       </div>

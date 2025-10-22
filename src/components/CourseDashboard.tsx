@@ -63,7 +63,6 @@ export default function CourseDashboard({
       return (
          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
             <div className="text-center">
-               <div className="text-6xl mb-4 animate-bounce">📚</div>
                <p className="text-xl text-slate-600">Ładowanie kursów...</p>
             </div>
          </div>
@@ -116,7 +115,6 @@ export default function CourseDashboard({
 
                      <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
                         <div className="flex items-center gap-1">
-                           <span>📚</span>
                            <span>
                               {countLessons(course)}
                               lekcji
@@ -155,7 +153,7 @@ export default function CourseDashboard({
             <div className="mt-16 text-center">
                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 max-w-2xl mx-auto">
                   <h2 className="text-2xl font-bold text-slate-800 mb-4">
-                     🎯 Nie wiesz od czego zacząć?
+                     Nie wiesz od czego zacząć?
                   </h2>
                   <p className="text-slate-600 mb-6">
                      Polecamy zacząć od kursu Python - idealny dla osób, które
@@ -172,7 +170,6 @@ export default function CourseDashboard({
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <div className="text-4xl mb-3">🎓</div>
                   <h3 className="font-semibold text-slate-800 mb-2">
                      Nauka przez praktykę
                   </h3>
@@ -182,7 +179,6 @@ export default function CourseDashboard({
                   </p>
                </div>
                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <div className="text-4xl mb-3">⭐</div>
                   <h3 className="font-semibold text-slate-800 mb-2">
                      System XP i osiągnięć
                   </h3>
@@ -191,7 +187,6 @@ export default function CourseDashboard({
                   </p>
                </div>
                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <div className="text-4xl mb-3">🔥</div>
                   <h3 className="font-semibold text-slate-800 mb-2">
                      Utrzymuj streak
                   </h3>

@@ -63,10 +63,10 @@ export default function CodeEditor({
                {!readOnly && (
                   <button
                      onClick={handleReset}
-                     className="px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition"
+                     className="px-3 py-1.5 bg-blue-600 text-sm text-white hover:bg-blue-700 rounded transition"
                      title="Reset code"
                   >
-                     🔄 Reset
+                     Reset
                   </button>
                )}
                {onRun && (
@@ -80,7 +80,7 @@ export default function CodeEditor({
                            <span className="animate-spin">⟳</span> Running...
                         </>
                      ) : (
-                        <>▶ Run Code</>
+                        <>Run Code</>
                      )}
                   </button>
                )}

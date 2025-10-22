@@ -69,7 +69,6 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
                localStorage.setItem("user_id", response.user_id);
             }
 
-            // Navigate to dashboard after successful login
             setTimeout(() => {
                onLoginSuccess?.();
             }, 1000);
@@ -119,7 +118,6 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
                localStorage.setItem("user_id", response.user_id);
             }
 
-            // Switch to login view or navigate to dashboard
             setTimeout(() => {
                if (response.access_token) {
                   onLoginSuccess?.();
