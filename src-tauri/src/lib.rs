@@ -194,46 +194,108 @@ async fn validate_python_code(
     }
 }
 async fn validate_typescript_code(
-    code:String,
-    expected_output:String
+    code: String,
+    expected_output: String,
 ) -> Result<CodeValidationResponse, String> {
+    use std::fs;
+    use std::path::PathBuf;
     use std::process::Command;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
-    let output = Command::new("ts-node")
-        .arg("-e")
-        .arg(&code)
-        .output();
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+    let pid = std::process::id();
+    let filename = format!("validate_ts_{}_{}.ts", pid, now);
 
-    match output {
-        Ok(result) => {
-            let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
-            let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+    let mut tmp_path: PathBuf = std::env::temp_dir();
+    tmp_path.push(filename);
 
-            if !stderr.is_empty() {
-                return Ok(CodeValidationResponse {
-                    success:true,
-                    output:stderr.clone(),
-                    error:Some(stderr),
-                    is_correct:false,
-                })
-            }
-
-            let is_correct = stdout == expected_output;
-
-            Ok(CodeValidationResponse {
-                success: true,
-                output: stdout,
-                error: None,
-                is_correct,
-            })
-        }
-        Err(e) => Ok(CodeValidationResponse {
-            success:false,
-            output:String::new(),
-            error:Some(format!("Ts-node nie działa, error: {}", e)),
-            is_correct:false,
-        })
+    if let Err(e) = fs::write(&tmp_path, code.as_bytes()) {
+        return Ok(CodeValidationResponse {
+            success: false,
+            output: String::new(),
+            error: Some(format!("Nie można zapisać pliku tymczasowego: {}", e)),
+            is_correct: false,
+        });
     }
+
+    fn run_with_file(cmd: &str, file: &PathBuf) -> std::io::Result<std::process::Output> {
+        Command::new(cmd)
+            .env("TS_NODE_TRANSPILE_ONLY", "true")
+            .env("TS_NODE_COMPILER_OPTIONS", r#"{"module":"commonjs","target":"es2019"}"#)
+            .arg(file)
+            .output()
+    }
+
+    let mut candidates: Vec<&str> = vec!["ts-node"];
+    if cfg!(target_os = "windows") {
+        candidates.extend_from_slice(&[
+            "ts-node.cmd",
+            ".\\node_modules\\.bin\\ts-node.cmd",
+            "..\\node_modules\\.bin\\ts-node.cmd",
+            "..\\..\\node_modules\\.bin\\ts-node.cmd",
+        ]);
+    } else {
+        candidates.extend_from_slice(&[
+            "./node_modules/.bin/ts-node",
+            "../node_modules/.bin/ts-node",
+            "../../node_modules/.bin/ts-node",
+        ]);
+    }
+
+    let mut last_err: Option<String> = None;
+    let mut chosen_output: Option<std::process::Output> = None;
+
+    for cmd in candidates.iter() {
+        match run_with_file(cmd, &tmp_path) {
+            Ok(out) => {
+                chosen_output = Some(out);
+                break;
+            }
+            Err(e) => {
+                last_err = Some(format!("{}", e));
+            }
+        }
+    }
+
+    let _ = fs::remove_file(&tmp_path);
+
+    let output = match chosen_output {
+        Some(out) => out,
+        None => {
+            return Ok(CodeValidationResponse {
+                success: false,
+                output: String::new(),
+                error: Some(format!(
+                    "Nie można znaleźć/uruchomić ts-node. Ostatni błąd: {}",
+                    last_err.unwrap_or_else(|| "unknown error".to_string())
+                )),
+                is_correct: false,
+            });
+        }
+    };
+
+    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+
+    if !stderr.is_empty() {
+        return Ok(CodeValidationResponse {
+            success: false,
+            output: stderr.clone(),
+            error: Some(stderr),
+            is_correct: false,
+        });
+    }
+
+    let is_correct = stdout == expected_output;
+    Ok(CodeValidationResponse {
+        success: true,
+        output: stdout,
+        error: None,
+        is_correct,
+    })
 }
 
 async fn validate_javascript_code(
