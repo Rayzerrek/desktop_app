@@ -93,8 +93,6 @@ export class LessonService {
     }
 
     async createLesson(lessonData: CreateLessonDTO): Promise<void> {
-        // Use invokeWithAuth to ensure accessToken is sent; backend uses serde aliasing
-        // to map camelCase to snake_case where needed.
         await this.invokeWithAuth<unknown>("create_lesson", {
             lesson: {
                 module_id: lessonData.module_id,
