@@ -25,7 +25,7 @@ async fn login_user(email: String, password: String) -> Result<AuthResponse, Str
 
     match client.sign_in(&email, &password).await {
         Ok(auth_response) => {
-            println!("✅ Login successful for user: {}", auth_response.user.id);
+            println!("Login successful for user: {}", auth_response.user.id);
 
             Ok(AuthResponse {
                 success: true,
@@ -36,7 +36,7 @@ async fn login_user(email: String, password: String) -> Result<AuthResponse, Str
             })
         }
         Err(e) => {
-            println!("❌ Login failed: {}", e);
+            println!("Login failed: {}", e);
 
             Ok(AuthResponse {
                 success: false,
@@ -62,7 +62,7 @@ async fn register_user(
     match client.sign_up(&email, &password, &username).await {
         Ok(auth_response) => {
             println!(
-                "✅ Registration successful for user: {}",
+                "Registration successful for user: {}",
                 auth_response.user.id
             );
 
@@ -89,7 +89,7 @@ async fn register_user(
             })
         }
         Err(e) => {
-            println!("❌ Registration failed: {}", e);
+            println!("Registration failed: {}", e);
 
             Ok(AuthResponse {
                 success: false,
@@ -142,11 +142,11 @@ async fn validate_code(
     language: String,
     expected_output: String,
 ) -> Result<CodeValidationResponse, String> {
-    println!("🔍 Validating {} code", language);
 
     match language.as_str() {
         "python" => validate_python_code(code, expected_output).await,
         "javascript" => validate_javascript_code(code, expected_output).await,
+        "typescript" => validate_typescript_code(code, expected_output).await,
         _ => Err(format!("Unsupported language: {}", language)),
     }
 }
@@ -191,6 +191,48 @@ async fn validate_python_code(
             error: Some(format!("Nie można uruchomić Pythona: {}. Upewnij się, że Python jest zainstalowany.", e)),
             is_correct: false,
         }),
+    }
+}
+async fn validate_typescript_code(
+    code:String,
+    expected_output:String
+) -> Result<CodeValidationResponse, String> {
+    use std::process::Command;
+
+    let output = Command::new("ts-node")
+        .arg("-e")
+        .arg(&code)
+        .output();
+
+    match output {
+        Ok(result) => {
+            let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
+            let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+
+            if !stderr.is_empty() {
+                return Ok(CodeValidationResponse {
+                    success:true,
+                    output:stderr.clone(),
+                    error:Some(stderr),
+                    is_correct:false,
+                })
+            }
+
+            let is_correct = stdout == expected_output;
+
+            Ok(CodeValidationResponse {
+                success: true,
+                output: stdout,
+                error: None,
+                is_correct,
+            })
+        }
+        Err(e) => Ok(CodeValidationResponse {
+            success:false,
+            output:String::new(),
+            error:Some(format!("Ts-node nie działa, error: {}", e)),
+            is_correct:false,
+        })
     }
 }
 

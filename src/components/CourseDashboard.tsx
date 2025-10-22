@@ -116,8 +116,7 @@ export default function CourseDashboard({
                      <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
                         <div className="flex items-center gap-1">
                            <span>
-                              {countLessons(course)}
-                              lekcji
+                              {countLessons(course)} lekcji
                            </span>
                         </div>
                         {course.estimatedHours && (

@@ -3,6 +3,7 @@ import AuthPanel from "./components/AuthPanel";
 import LessonDemo from "./components/LessonDemo";
 import CourseDashboard from "./components/CourseDashboard";
 import AdminPanel from "./components/AdminPanel";
+import CodePlayground from "./components/CodePlayground";
 import Toast, { ToastType } from "./components/Toast";
 import { lessonService } from "./services/LessonService";
 import { useAuth } from "./hooks/useAuth";
@@ -12,7 +13,7 @@ function App() {
 
    const {isAuthenticated, isAdmin, refreshAdmin, login, logout} = useAuth();
    const [currentView, setCurrentView] = useState<
-      "auth" | "dashboard" | "lesson" | "admin"
+      "auth" | "dashboard" | "lesson" | "admin" | "playground"
    >("auth");
    const [selectedCourseId, setSelectedCourseId] = useState<string>("");
    const [selectedLessonId, setSelectedLessonId] = useState<string>("");
@@ -108,6 +109,10 @@ function App() {
       return <AdminPanel onBack={() => setCurrentView("dashboard")} />;
    }
 
+   if (currentView === "playground") {
+      return <CodePlayground onBack={() => setCurrentView("dashboard")} />;
+   }
+
    if (currentView === "lesson") {
       return (
          <div>
@@ -140,14 +145,22 @@ function App() {
                   onClose={() => setToast(null)}
                />
             )}
-            <button
-               onClick={() => {
-                  logout();
-               }}
-               className="fixed bottom-4 left-4 z-50 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
-            >
-               Wyloguj
-            </button>
+            <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
+               <button
+                  onClick={() => {
+                     logout();
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-lg text-sm"
+               >
+                  Wyloguj
+               </button>
+               <button
+                  onClick={() => setCurrentView("playground")}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg text-sm"
+               >
+                  Code Playground
+               </button>
+            </div>
             {isAdmin && (
                <button
                   onClick={handleAdminAccess}
