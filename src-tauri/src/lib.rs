@@ -356,8 +356,15 @@ pub fn run() {
             if let Ok(prod_env) = app.path().resource_dir() {
                 let env_path = prod_env.join(".env.production");
                 if env_path.exists() {
+                    println!("Loaded .env.production file from {:?}", env_path);
                     dotenvy::from_path(env_path).ok();
+                } else {
+                    println!("No env.production found at {:?}", env_path);
                 }
+            }
+
+            if dotenvy::dotenv().is_ok() {
+                println!("Loaded .env local file");
             }
 
             dotenvy::dotenv().ok();
