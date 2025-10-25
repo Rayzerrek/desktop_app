@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tauri::Manager;
 
 mod supabase;
 use supabase::{get_supabase_config, SupabaseClient};
@@ -351,6 +352,17 @@ pub fn run() {
     }
 
     tauri::Builder::default()
+        .setup(|app| {
+            if let Ok(prod_env) = app.path().resource_dir() {
+                let env_path = prod_env.join(".env.production");
+                if env_path.exists() {
+                    dotenvy::from_path(env_path).ok();
+                }
+            }
+
+            dotenvy::dotenv().ok();
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             login_user,

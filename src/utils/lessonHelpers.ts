@@ -1,5 +1,5 @@
 
-import { ExerciseLesson, TheoryLesson, QuizLesson, ProjectLesson, LessonContent } from "../types/lesson";
+import { ExerciseLesson, TheoryLesson, QuizLesson, ProjectLesson} from "../types/lesson";
 
 export function createExerciseContent(data: {
     instruction: string;
