@@ -26,9 +26,6 @@
       }
    },
    "bundle": {
-      "resources":[
-         ".env.production"
-      ],
       "active": true,
       "targets": "all",
       "icon": [

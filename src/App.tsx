@@ -167,7 +167,7 @@ function App() {
                   className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition shadow-lg text-sm flex items-center gap-2"
                >
                   Panel Admina
-               </button>
+              </button>
             )}
             <CourseDashboard onCourseSelect={handleCourseSelect} />
          </div>

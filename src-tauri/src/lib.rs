@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
 
 mod supabase;
 use supabase::{get_supabase_config, SupabaseClient};
@@ -344,6 +343,7 @@ async fn validate_javascript_code(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Ładuj .env tylko w dev mode
     #[cfg(debug_assertions)]
     {
         if let Err(e) = dotenvy::dotenv() {
@@ -352,24 +352,6 @@ pub fn run() {
     }
 
     tauri::Builder::default()
-        .setup(|app| {
-            if let Ok(prod_env) = app.path().resource_dir() {
-                let env_path = prod_env.join(".env.production");
-                if env_path.exists() {
-                    println!("Loaded .env.production file from {:?}", env_path);
-                    dotenvy::from_path(env_path).ok();
-                } else {
-                    println!("No env.production found at {:?}", env_path);
-                }
-            }
-
-            if dotenvy::dotenv().is_ok() {
-                println!("Loaded .env local file");
-            }
-
-            dotenvy::dotenv().ok();
-            Ok(())
-        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             login_user,
