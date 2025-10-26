@@ -19,6 +19,18 @@ pub struct SupabaseError {
     pub error: String,
     pub error_description: Option<String>,
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SearchResult {
+    #[serde(rename = "type")]
+    pub result_type:String,
+    pub id:String,
+    pub title:String, 
+    pub description:Option<String>,
+    #[serde(rename="courseName")]
+    pub course_name:Option<String>,
+    #[serde(rename="moduleName")]
+    pub module_name:Option<String>,
+}
 
 pub struct SupabaseClient {
     url: String,
@@ -669,4 +681,85 @@ pub async fn delete_course(course_id: String, access_token: String) -> Result<()
         None,
     ).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn search_lessons(query: String, access_token: String) -> Result<Vec<SearchResult>, String> {
+    let client = get_supabase_client()?;
+    
+    // Search pattern for PostgreSQL ILIKE
+    let search_pattern = format!("%{}%", query.to_lowercase());
+    
+    // Search in courses
+    let courses_endpoint = format!(
+        "courses?select=id,title,description&or=(title.ilike.{},description.ilike.{})&is_published=eq.true&limit=5",
+        urlencoding::encode(&search_pattern),
+        urlencoding::encode(&search_pattern)
+    );
+    
+    let courses: Vec<CourseRow> = client.rest_request(
+        reqwest::Method::GET,
+        &courses_endpoint,
+        &access_token,
+        None,
+    ).await.unwrap_or_default();
+    
+    // Search in lessons with course and module info
+    let lessons_endpoint = format!(
+        "lessons?select=id,title,description,language,module_id,modules(title,course_id,courses(title))&or=(title.ilike.{},description.ilike.{})&limit=10",
+        urlencoding::encode(&search_pattern),
+        urlencoding::encode(&search_pattern)
+    );
+    
+    let lessons_response: Result<Vec<serde_json::Value>, String> = client.rest_request(
+        reqwest::Method::GET,
+        &lessons_endpoint,
+        &access_token,
+        None,
+    ).await;
+    
+    let mut results = Vec::new();
+    
+    // Add course results
+    for course in courses {
+        results.push(SearchResult {
+            result_type: "course".to_string(),
+            id: course.id,
+            title: course.title,
+            description: Some(course.description),
+            course_name: None,
+            module_name: None,
+        });
+    }
+    
+    // Add lesson results
+    if let Ok(lessons) = lessons_response {
+        for lesson in lessons {
+            let id = lesson.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
+            let title = lesson.get("title").and_then(|v| v.as_str()).unwrap_or("").to_string();
+            let description = lesson.get("description").and_then(|v| v.as_str()).map(|s| s.to_string());
+            
+            let module_name = lesson.get("modules")
+                .and_then(|m| m.get("title"))
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string());
+                
+            let course_name = lesson.get("modules")
+                .and_then(|m| m.get("courses"))
+                .and_then(|c| c.get("title"))
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string());
+            
+            results.push(SearchResult {
+                result_type: "lesson".to_string(),
+                id,
+                title,
+                description,
+                course_name,
+                module_name,
+            });
+        }
+    }
+    
+    Ok(results)
 }

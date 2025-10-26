@@ -4,6 +4,7 @@ import { JSX, useEffect, useState } from "react";
 import { SiPython, SiJavascript, SiHtml5, SiCss3, SiTypescript} from "react-icons/si";
 import { DiJava } from "react-icons/di";
 import { countLessons } from "../utils/courseUtils";
+import SearchBar from "./Searchbar";
 
 interface CourseDashboardProps {
    onCourseSelect: (courseId: string) => void;
@@ -69,17 +70,34 @@ export default function CourseDashboard({
       );
    }
 
+   const handleSearchResultSelect = (result: { type: "course" | "lesson"; id: string }) => {
+      if (result.type === "course") {
+         onCourseSelect(result.id);
+      } else {
+         console.log("Selected lesson:", result.id);
+      }
+   };
+
    return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
                <h1 className="text-5xl font-bold text-slate-800 mb-4">
                   Wybierz swój kurs
                </h1>
-               <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+               <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
                   Rozpocznij swoją przygodę z programowaniem. Wybierz kurs i
                   zacznij naukę już teraz!
                </p>
+               
+               {/* Search Bar */}
+               <div className="flex justify-center mb-6">
+                  <SearchBar 
+                     onResultSelect={handleSearchResultSelect}
+                     placeholder="Szukaj kursów i lekcji..."
+                     className="w-full max-w-2xl"
+                  />
+               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

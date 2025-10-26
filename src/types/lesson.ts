@@ -1,16 +1,16 @@
-export interface CodeBlock {
+interface CodeBlock {
    type: "text" | "code" | "tip" | "warning" | "info";
    content: string;
    language?: string;
    code?: string;
 }
 
-export interface TheoryLesson {
+interface TheoryLesson {
    type: "theory";
    blocks: CodeBlock[];
 }
 
-export interface ExerciseLesson {
+interface ExerciseLesson {
    type: "exercise";
    instruction: string;
    starterCode: string;
@@ -25,19 +25,19 @@ export interface ExerciseLesson {
    }[];
 }
 
-export interface QuizOption {
+interface QuizOption {
    text: string;
    isCorrect: boolean;
    explanation?: string;
 }
 
-export interface QuizLesson {
+interface QuizLesson {
    type: "quiz";
    question: string;
    options: QuizOption[];
    explanation?: string;
 }
-export interface CreateCourseDTO {
+interface CreateCourseDTO {
    title: string;
    description: string;
    difficulty: Difficulty;
@@ -48,14 +48,14 @@ export interface CreateCourseDTO {
    estimatedHours?: number;
    iconUrl?: string;
 }
-export interface CreateModuleDTO {
+interface CreateModuleDTO {
    course_id: string;
    title: string;
    description: string;
    orderIndex: number;
    iconEmoji?: string;
 }
-export interface CreateLessonDTO {
+interface CreateLessonDTO {
    module_id: string;
    title: string;
    description?: string;
@@ -68,7 +68,7 @@ export interface CreateLessonDTO {
    estimatedMinutes?: number;
 }
 
-export interface ProjectLesson {
+interface ProjectLesson {
    type: "project";
    title: string;
    description: string;
@@ -77,13 +77,13 @@ export interface ProjectLesson {
    hints?: string[];
 }
 
-export type LessonContent =
+type LessonContent =
    | TheoryLesson
    | ExerciseLesson
    | QuizLesson
    | ProjectLesson;
 
-export interface Lesson {
+interface Lesson {
    id: string;
    title: string;
    description?: string;
@@ -96,7 +96,7 @@ export interface Lesson {
    estimatedMinutes?: number;
 }
 
-export interface Module {
+interface Module {
    id: string;
    title: string;
    description: string;
@@ -105,7 +105,7 @@ export interface Module {
    iconEmoji?: string;
 }
 
-export interface Course {
+interface Course {
    id: string;
    title: string;
    description: string;
@@ -118,7 +118,7 @@ export interface Course {
    isPublished: boolean;
 }
 
-export interface UserProgress {
+interface UserProgress {
    lessonId: string;
    status: "not_started" | "in_progress" | "completed";
    score?: number;
@@ -126,12 +126,19 @@ export interface UserProgress {
    completedAt?: string;
    timeSpentSeconds?: number;
 }
-export type Difficulty = "beginner" | "intermediate" | "advanced";
-export type LessonType = "theory" | "exercise" | "quiz" | "project";
-export type Language = "python" | "javascript" | "html" | "css" | "typescript";
+type Difficulty = "beginner" | "intermediate" | "advanced";
+type LessonType = "theory" | "exercise" | "quiz" | "project";
+type Language = "python" | "javascript" | "html" | "css" | "typescript";
 
-export interface UserCourseProgress {
+interface UserCourseProgress {
    courseId: string;
    progress: UserProgress[];
 }
-export type UserProgressData = UserProgress | UserCourseProgress;
+type UserProgressData = UserProgress | UserCourseProgress;
+
+export type {
+   CodeBlock, TheoryLesson, ExerciseLesson, QuizLesson, QuizOption,
+   ProjectLesson, LessonContent, Lesson, Module, Course,
+   UserProgress, CreateCourseDTO, CreateModuleDTO, CreateLessonDTO,
+   Difficulty, LessonType, Language, UserProgressData, UserCourseProgress
+}

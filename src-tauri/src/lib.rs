@@ -366,7 +366,8 @@ pub fn run() {
             supabase::create_lesson,
             supabase::update_lesson,
             supabase::delete_lesson,
-            supabase::delete_course
+            supabase::delete_course,
+            supabase::search_lessons
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
