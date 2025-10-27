@@ -166,7 +166,7 @@ export default function SearchBar({
                 )}
             </div>
 
-            {/* Search Results Dropdown */}
+            {/* Search Results */}
             {isOpen && results.length > 0 && (
                 <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-200 
                               rounded-xl shadow-2xl overflow-hidden animate-slide-down">

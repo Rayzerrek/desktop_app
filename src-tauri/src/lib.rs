@@ -343,7 +343,7 @@ async fn validate_javascript_code(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Ładuj .env tylko w dev mode
+    // Ładowanie .env tylko w dev mode
     #[cfg(debug_assertions)]
     {
         if let Err(e) = dotenvy::dotenv() {
