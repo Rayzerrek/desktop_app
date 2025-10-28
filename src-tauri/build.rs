@@ -1,7 +1,15 @@
 fn main() {
     #[cfg(not(debug_assertions))]
     {
-        if let Ok(_) = dotenvy::from_filename(".env.production") {
+        let mut loaded = false;
+        for candidate in [".env.production", "../.env.production"] {
+            if dotenvy::from_filename(candidate).is_ok() {
+                loaded = true;
+                break;
+            }
+        }
+
+        if loaded {
             if let Ok(url) = std::env::var("SUPABASE_URL") {
                 println!("cargo:rustc-env=SUPABASE_URL={}", url);
             }
