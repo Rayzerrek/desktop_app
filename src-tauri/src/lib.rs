@@ -142,7 +142,6 @@ async fn validate_code(
     language: String,
     expected_output: String,
 ) -> Result<CodeValidationResponse, String> {
-
     match language.as_str() {
         "python" => validate_python_code(code, expected_output).await,
         "javascript" => validate_javascript_code(code, expected_output).await,
@@ -157,10 +156,7 @@ async fn validate_python_code(
 ) -> Result<CodeValidationResponse, String> {
     use std::process::Command;
 
-    let output = Command::new("python")
-        .arg("-c")
-        .arg(&code)
-        .output();
+    let output = Command::new("python").arg("-c").arg(&code).output();
 
     match output {
         Ok(result) => {
@@ -188,7 +184,10 @@ async fn validate_python_code(
         Err(e) => Ok(CodeValidationResponse {
             success: false,
             output: String::new(),
-            error: Some(format!("Nie można uruchomić Pythona: {}. Upewnij się, że Python jest zainstalowany.", e)),
+            error: Some(format!(
+                "Nie można uruchomić Pythona: {}. Upewnij się, że Python jest zainstalowany.",
+                e
+            )),
             is_correct: false,
         }),
     }
@@ -224,7 +223,10 @@ async fn validate_typescript_code(
     fn run_with_file(cmd: &str, file: &PathBuf) -> std::io::Result<std::process::Output> {
         Command::new(cmd)
             .env("TS_NODE_TRANSPILE_ONLY", "true")
-            .env("TS_NODE_COMPILER_OPTIONS", r#"{"module":"commonjs","target":"es2019"}"#)
+            .env(
+                "TS_NODE_COMPILER_OPTIONS",
+                r#"{"module":"commonjs","target":"es2019"}"#,
+            )
             .arg(file)
             .output()
     }
@@ -304,10 +306,7 @@ async fn validate_javascript_code(
 ) -> Result<CodeValidationResponse, String> {
     use std::process::Command;
 
-    let output = Command::new("node")
-        .arg("-e")
-        .arg(&code)
-        .output();
+    let output = Command::new("node").arg("-e").arg(&code).output();
 
     match output {
         Ok(result) => {
@@ -335,7 +334,10 @@ async fn validate_javascript_code(
         Err(e) => Ok(CodeValidationResponse {
             success: false,
             output: String::new(),
-            error: Some(format!("Nie można uruchomić Node.js: {}. Upewnij się, że Node.js jest zainstalowany.", e)),
+            error: Some(format!(
+                "Nie można uruchomić Node.js: {}. Upewnij się, że Node.js jest zainstalowany.",
+                e
+            )),
             is_correct: false,
         }),
     }
