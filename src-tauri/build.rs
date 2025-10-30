@@ -2,7 +2,7 @@ fn main() {
     #[cfg(not(debug_assertions))]
     {
         let mut loaded = false;
-        for candidate in [".env.production", "../.env.production"] {
+        for candidate in [".env.production"] {
             if dotenvy::from_filename(candidate).is_ok() {
                 loaded = true;
                 break;

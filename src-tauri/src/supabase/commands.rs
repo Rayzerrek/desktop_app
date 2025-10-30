@@ -180,7 +180,7 @@ pub async fn update_lesson(
 #[tauri::command]
 pub async fn delete_lesson(lesson_id: String, access_token: String) -> Result<(), String> {
     let client = get_supabase_client()?;
-    let _: Value = client
+    let _: Option<Value> = client
         .rest_request(
             Method::DELETE,
             &format!("lessons?id=eq.{}", lesson_id),
@@ -194,7 +194,7 @@ pub async fn delete_lesson(lesson_id: String, access_token: String) -> Result<()
 #[tauri::command]
 pub async fn delete_course(course_id: String, access_token: String) -> Result<(), String> {
     let client = get_supabase_client()?;
-    let _: Value = client
+    let _: Option<Value> = client
         .rest_request(
             Method::DELETE,
             &format!("courses?id=eq.{}", course_id),

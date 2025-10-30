@@ -330,10 +330,15 @@ impl SupabaseClient {
             .map_err(|e| format!("Network error: {}", e))?;
 
         if response.status().is_success() {
-            response
-                .json()
-                .await
-                .map_err(|e| format!("Failed to parse response: {}", e))
+            if response.status() == reqwest::StatusCode::NO_CONTENT {
+                serde_json::from_value(serde_json::Value::Null)
+                    .map_err(|e| format!("Failed to parse empty response: {}", e))
+            } else {
+                response
+                    .json()
+                    .await
+                    .map_err(|e| format!("Failed to parse response: {}", e))
+            }
         } else {
             let error_text = response
                 .text()

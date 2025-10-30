@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Course, Module, Lesson } from "../types/lesson";
 import { lessonService } from "../services/LessonService";
 import { createExerciseContent } from "../utils/lessonHelpers";
+import LessonEditDialog from "./LessonEditDialog";
 
 interface AdminPanelProps {
    onBack: () => void;
@@ -15,6 +16,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
    const [selectedModule, setSelectedModule] = useState<Module | null>(null);
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState(true);
+   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
 
    const [newCourse, setNewCourse] = useState({
       title: "",
@@ -34,6 +36,14 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
    useEffect(() => {
       loadCourses();
    }, []);
+
+   const openEdit = (lesson_id: string) => {
+      setEditingLessonId(lesson_id);
+   };
+
+   const handleEditSuccess = () => {
+      loadCourses();
+   };
 
    const loadCourses = async () => {
       try {
@@ -179,9 +189,9 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
       try {
          await lessonService.deleteCourse(courseId);
          alert("Kurs usunięty pomyślnie!");
-         await loadCourses(); // Przeładuj listę kursów
-         setSelectedCourse(null); // Wyczyść wybrany kurs
-         setSelectedModule(null); // Wyczyść wybrany moduł
+         await loadCourses(); 
+         setSelectedCourse(null); 
+         setSelectedModule(null); 
       } catch (error) {
          console.error("Error deleting course:", error);
          alert("Błąd podczas usuwania kursu: " + error);
@@ -309,7 +319,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                  {selectedCourse?.id === course.id && (
                                     <div className="mt-4 space-y-2 pl-4 border-l-4 border-purple-300">
                                        <p className="text-sm font-medium text-slate-700 mb-2">
-                                          📦 Moduły w tym kursie:
+                                          Moduły w tym kursie:
                                        </p>
                                        {course.modules.map((module: Module) => (
                                           <div
@@ -396,7 +406,11 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                           </p>
                                        </div>
                                        <div className="flex gap-2">
-                                          <button className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm">
+                                          <button 
+                                             className="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm"
+                                             onClick = {() => openEdit(lesson.id)}
+                                          >
+
                                              Edytuj
                                           </button>
                                           <button className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">
@@ -900,6 +914,16 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                )}
             </div>
          </div>
+
+         {/* Edit Dialog */}
+         {editingLessonId && (
+            <LessonEditDialog
+               isOpen={true}
+               onClose={() => setEditingLessonId(null)}
+               lessonId={editingLessonId}
+               onSuccess={handleEditSuccess}
+            />
+         )}
       </div>
    );
 }
