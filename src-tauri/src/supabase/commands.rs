@@ -5,8 +5,8 @@ use super::{
     client::SupabaseClient,
     config::get_supabase_config,
     types::{
-        Course, CourseRow, CreateCourseInput, CreateLessonInput, CreateModuleInput, Lesson, Module,
-        ModuleRow, SearchResult,
+        Course, CourseRow, CreateCourseInput, CreateLessonInput, CreateModuleInput, 
+        CreateProgressInput, Lesson, Module, ModuleRow, SearchResult, UserProgress,
     },
 };
 
@@ -212,12 +212,13 @@ pub async fn search_lessons(
 ) -> Result<Vec<SearchResult>, String> {
     let client = get_supabase_client()?;
 
-    let search_pattern = format!("%{}%", query.to_lowercase());
-
+    // Encode query properly - don't add wildcards before encoding
+    let encoded_query = urlencoding::encode(&query);
+    
     let courses_endpoint = format!(
-        "courses?select=id,title,description&or=(title.ilike.{},description.ilike.{})&is_published=eq.true&limit=5",
-        urlencoding::encode(&search_pattern),
-        urlencoding::encode(&search_pattern)
+        "courses?select=id,title,description&or=(title.ilike.*{}*,description.ilike.*{}*)&is_published=eq.true&limit=5",
+        encoded_query,
+        encoded_query
     );
 
     let courses: Vec<CourseRow> = client
@@ -226,9 +227,9 @@ pub async fn search_lessons(
         .unwrap_or_default();
 
     let lessons_endpoint = format!(
-        "lessons?select=id,title,description,language,module_id,modules(title,course_id,courses(title))&or=(title.ilike.{},description.ilike.{})&limit=10",
-        urlencoding::encode(&search_pattern),
-        urlencoding::encode(&search_pattern)
+        "lessons?select=id,title,description,language,module_id,modules(title,course_id,courses(title))&or=(title.ilike.*{}*,description.ilike.*{}*)&limit=10",
+        encoded_query,
+        encoded_query
     );
 
     let lessons_response: Result<Vec<Value>, String> = client
@@ -290,4 +291,85 @@ pub async fn search_lessons(
     }
 
     Ok(results)
+}
+
+#[tauri::command]
+pub async fn get_user_progress(
+    user_id: String,
+    access_token: String,
+) -> Result<Vec<UserProgress>, String> {
+    let client = get_supabase_client()?;
+    
+    let endpoint = format!("user_progress?select=*&user_id=eq.{}", user_id);
+    
+    client
+        .rest_request(Method::GET, &endpoint, &access_token, None)
+        .await
+}
+
+#[tauri::command]
+pub async fn update_lesson_progress(
+    progress: CreateProgressInput,
+    access_token: String,
+) -> Result<UserProgress, String> {
+    let client = get_supabase_client()?;
+
+    // Check if progress already exists
+    let existing: Vec<UserProgress> = client
+        .rest_request(
+            Method::GET,
+            &format!(
+                "user_progress?select=*&user_id=eq.{}&lesson_id=eq.{}",
+                progress.user_id, progress.lesson_id
+            ),
+            &access_token,
+            None,
+        )
+        .await
+        .unwrap_or_default();
+
+    if let Some(existing_progress) = existing.first() {
+        // Update existing progress
+        let body = json!({
+            "status": progress.status,
+            "score": progress.score,
+            "attempts": progress.attempts,
+            "completed_at": progress.completed_at,
+            "time_spent_seconds": progress.time_spent_seconds,
+        });
+
+        let updated: Vec<UserProgress> = client
+            .rest_request(
+                Method::PATCH,
+                &format!("user_progress?id=eq.{}", existing_progress.id.as_ref().unwrap()),
+                &access_token,
+                Some(body),
+            )
+            .await?;
+
+        updated
+            .into_iter()
+            .next()
+            .ok_or_else(|| "Failed to update progress".to_string())
+    } else {
+        // Create new progress
+        let body = json!({
+            "user_id": progress.user_id,
+            "lesson_id": progress.lesson_id,
+            "status": progress.status,
+            "score": progress.score,
+            "attempts": progress.attempts,
+            "completed_at": progress.completed_at,
+            "time_spent_seconds": progress.time_spent_seconds,
+        });
+
+        let created: Vec<UserProgress> = client
+            .rest_request(Method::POST, "user_progress", &access_token, Some(body))
+            .await?;
+
+        created
+            .into_iter()
+            .next()
+            .ok_or_else(|| "Failed to create progress".to_string())
+    }
 }

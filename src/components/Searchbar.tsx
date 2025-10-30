@@ -128,11 +128,11 @@ export default function SearchBar({
 
     return (
         <div ref={searchRef} className={`relative w-full max-w-2xl ${className}`}>
-            {/* Search Input */}
-            <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+            {/* Search Input - Material 3 Style */}
+            <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-600 transition-colors">
                     {isLoading ? (
-                        <FiLoader className="w-5 h-5 animate-spin" />
+                        <FiLoader className="w-5 h-5 animate-spin text-purple-600" />
                     ) : (
                         <FiSearch className="w-5 h-5" />
                     )}
@@ -148,17 +148,23 @@ export default function SearchBar({
                         if (results.length > 0) setIsOpen(true);
                     }}
                     placeholder={placeholder}
-                    className="w-full pl-12 pr-12 py-3 bg-white border-2 border-slate-200 rounded-xl 
-                             text-slate-800 placeholder-slate-400
-                             focus:border-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-100
-                             transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="w-full pl-12 pr-12 py-4 bg-surface-container rounded-full
+                             text-slate-900 placeholder-slate-500
+                             focus:outline-none focus:ring-0
+                             transition-all duration-300 ease-out
+                             shadow-md hover:shadow-lg focus:shadow-xl
+                             border border-transparent focus:border-purple-300"
+                    style={{
+                        backgroundColor: '#F3F4F6'
+                    }}
                 />
 
                 {query && (
                     <button
                         onClick={handleClear}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 
-                                 hover:text-slate-600 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 
+                                 hover:text-slate-700 hover:bg-slate-200 rounded-full p-1
+                                 transition-all duration-200"
                         aria-label="Clear search"
                     >
                         <FiX className="w-5 h-5" />
@@ -166,44 +172,53 @@ export default function SearchBar({
                 )}
             </div>
 
-            {/* Search Results */}
+            {/* Search Results - Material 3 Elevated Surface */}
             {isOpen && results.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-200 
-                              rounded-xl shadow-2xl overflow-hidden animate-slide-down">
+                <div className="absolute z-50 w-full mt-3 bg-white rounded-3xl shadow-2xl overflow-hidden 
+                              animate-slide-down border border-slate-100"
+                     style={{
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
+                     }}>
                     <div className="max-h-96 overflow-y-auto">
                         {results.map((result, index) => (
                             <button
                                 key={`${result.type}-${result.id}`}
                                 onClick={() => handleResultClick(result)}
-                                className={`w-full px-4 py-3 flex items-start gap-3 text-left 
-                                          transition-colors border-b border-slate-100 last:border-b-0
+                                className={`w-full px-5 py-4 flex items-start gap-3 text-left 
+                                          transition-all duration-200
+                                          border-b border-slate-50 last:border-b-0
                                           ${selectedIndex === index 
-                                            ? 'bg-purple-50 border-l-4 border-l-purple-500' 
-                                            : 'hover:bg-slate-50'
+                                            ? 'bg-purple-50/70 backdrop-blur-sm' 
+                                            : 'hover:bg-slate-50/80'
                                           }`}
                             >
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <h4 className="font-semibold text-slate-800 truncate">
+                                        <h4 className="font-semibold text-slate-900 truncate">
                                             {result.title}
                                         </h4>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0
+                                        <span className={`text-xs px-3 py-1 rounded-full flex-shrink-0 font-medium
                                                        ${result.type === 'course' 
-                                                         ? 'bg-blue-100 text-blue-700' 
-                                                         : 'bg-green-100 text-green-700'
+                                                         ? 'bg-blue-100 text-blue-800' 
+                                                         : 'bg-green-100 text-green-800'
                                                        }`}>
                                             {result.type === 'course' ? 'Kurs' : 'Lekcja'}
                                         </span>
                                     </div>
                                     {result.description && (
-                                        <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                                        <p className="text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
                                             {result.description}
                                         </p>
                                     )}
                                     {result.courseName && (
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {result.courseName}
-                                            {result.moduleName && ` • ${result.moduleName}`}
+                                        <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                                            <span className="font-medium">{result.courseName}</span>
+                                            {result.moduleName && (
+                                                <>
+                                                    <span className="text-slate-400">•</span>
+                                                    <span>{result.moduleName}</span>
+                                                </>
+                                            )}
                                         </p>
                                     )}
                                 </div>
@@ -211,24 +226,27 @@ export default function SearchBar({
                         ))}
                     </div>
                     
-                    <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between">
-                        <span>Znaleziono {results.length} wyników</span>
-                        <span className="text-slate-400">
-                            <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs">↑↓</kbd>
-                            {' '}nawigacja{' '}
-                            <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs">Enter</kbd>
-                            {' '}wybierz
+                    <div className="px-5 py-3 bg-slate-50/80 backdrop-blur-sm border-t border-slate-100 
+                                  text-xs text-slate-600 flex items-center justify-between">
+                        <span className="font-medium">Znaleziono {results.length} wyników</span>
+                        <span className="text-slate-500 flex items-center gap-2">
+                            <kbd className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium shadow-sm">↑↓</kbd>
+                            <span>nawigacja</span>
+                            <kbd className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium shadow-sm">Enter</kbd>
+                            <span>wybierz</span>
                         </span>
                     </div>
                 </div>
             )}
 
-            {/* No Results */}
+            {/* No Results - Material 3 */}
             {isOpen && !isLoading && query.length >= 2 && results.length === 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-200 
-                              rounded-xl shadow-xl p-6 text-center">
-                    <p className="text-slate-600 font-medium">Brak wyników</p>
-                    <p className="text-sm text-slate-400 mt-1">
+                <div className="absolute z-50 w-full mt-3 bg-white rounded-3xl shadow-xl p-8 text-center border border-slate-100"
+                     style={{
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
+                     }}>
+                    <p className="text-slate-800 font-semibold text-lg">Brak wyników</p>
+                    <p className="text-sm text-slate-500 mt-2">
                         Spróbuj użyć innych słów kluczowych
                     </p>
                 </div>

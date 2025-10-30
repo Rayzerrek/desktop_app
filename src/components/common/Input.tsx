@@ -1,5 +1,5 @@
-const inputStyle = "w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all duration-200";
-const labelStyle = "block text-sm font-medium text-slate-700 mb-2";
+const inputStyle = "w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white focus:ring-0 focus:border-blue-500 outline-none transition-all duration-200 hover:border-slate-300";
+const labelStyle = "block text-sm font-semibold text-slate-700 mb-2";
 interface InputProps {
   label: string;
   type: string;

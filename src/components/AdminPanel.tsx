@@ -68,10 +68,12 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
       lessonType: "exercise" as "exercise" | "theory" | "quiz" | "project",
       xpReward: 10,
       instruction: "",
-      starterCode: "",
+      starterCode: "# Kod który użytkownik zobaczy na starcie",
       solution: "",
       hint: "",
       expectedOutput: "",
+      exampleCode: "",
+      exampleDescription: "",
    });
 
    const handleCreateLesson = async () => {
@@ -87,7 +89,9 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             starterCode: newLesson.starterCode,
             solution: newLesson.solution,
             hint: newLesson.hint,
-            expectedOutput: newLesson.expectedOutput
+            expectedOutput: newLesson.expectedOutput,
+            exampleCode: newLesson.exampleCode,
+            exampleDescription: newLesson.exampleDescription
          });
 
          await lessonService.createLesson({
@@ -116,6 +120,8 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             solution: "",
             hint: "",
             expectedOutput: "",
+            exampleCode: "",
+            exampleDescription: "",
          });
 
          loadCourses();
@@ -199,58 +205,62 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
    }
 
    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
          <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-10">
                <div>
-                  <h1 className="text-4xl font-bold text-slate-800 mb-2">
+                  <h1 className="text-5xl font-bold text-slate-900 mb-2 tracking-tight">
                      Panel Admina
                   </h1>
-                  <p className="text-slate-600">Zarządzaj kursami i lekcjami</p>
+                  <p className="text-slate-600 text-lg">Zarządzaj kursami i lekcjami</p>
                </div>
                <button
                   onClick={onBack}
-                  className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition shadow-md"
+                  className="px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white rounded-full 
+                           transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
                >
-                  ← Powrót
+                  Powrót
                </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 bg-white/80 backdrop-blur-sm rounded-lg p-1 shadow-lg border border-white/20">
+            <div className="flex gap-2 mb-8 bg-white rounded-full p-1.5 shadow-lg border border-slate-200"
+                 style={{
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)'
+                 }}>
                <button
                   onClick={() => setActiveTab("courses")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "courses"
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
-                        : "text-slate-600 hover:bg-slate-100"
+                  className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${activeTab === "courses"
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-100"
                      }`}
                >
                   Kursy
                </button>
                <button
                   onClick={() => setActiveTab("create-course")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "create-course"
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
-                        : "text-slate-600 hover:bg-slate-100"
+                  className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${activeTab === "create-course"
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-100"
                      }`}
                >
                   Utwórz kurs
                </button>
                <button
                   onClick={() => setActiveTab("lessons")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "lessons"
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
-                        : "text-slate-600 hover:bg-slate-100"
+                  className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${activeTab === "lessons"
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-100"
                      }`}
                >
                   Wszystkie lekcje
                </button>
                <button
                   onClick={() => setActiveTab("create")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200 ${activeTab === "create"
-                        ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md"
-                        : "text-slate-600 hover:bg-slate-100"
+                  className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${activeTab === "create"
+                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-100"
                      }`}
                >
                   Utwórz lekcję
@@ -258,23 +268,29 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             </div>
 
             {/* Content */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+            <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8"
+                 style={{
+                    boxShadow: '0 12px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)'
+                 }}>
                {activeTab === "courses" && (
                   <div>
-                     <h2 className="text-2xl font-bold text-slate-800 mb-4">
+                     <h2 className="text-3xl font-bold text-slate-900 mb-6">
                         Lista kursów
                      </h2>
                      {loading ? (
-                        <div className="text-center py-12">
-                           <div className="text-4xl mb-4 animate-spin">⏳</div>
-                           <p className="text-slate-600">Ładowanie...</p>
+                        <div className="text-center py-16">
+                           <p className="text-slate-600 text-lg">Ładowanie...</p>
                         </div>
                      ) : (
                         <div className="space-y-4">
                            {courses.map((course: Course) => (
                               <div
                                  key={course.id}
-                                 className="p-4 bg-slate-50 rounded-lg border-2 border-slate-200 hover:shadow-md transition"
+                                 className="p-6 bg-gradient-to-br from-white to-slate-50 rounded-2xl 
+                                          border border-slate-200 hover:shadow-xl transition-all duration-300"
+                                 style={{
+                                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)'
+                                 }}
                               >
                                  <div className="flex items-center justify-between mb-3">
                                     <div>
@@ -294,7 +310,8 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                     <div className="flex items-end gap-3">
                                        <button
                                           onClick={() => {handleDeleteCourse(course.id)}}
-                                          className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition"
+                                          className="px-5 py-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white 
+                                                   text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
                                        >
                                           Usuń
                                        </button>
@@ -303,12 +320,12 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                              setSelectedCourse(selectedCourse?.id === course.id ? null : course);
                                              setSelectedModule(null);
                                           }}
-                                          className={`px-4 py-2 rounded-lg transition text-sm font-medium ${selectedCourse?.id === course.id
-                                                ? "bg-purple-500 text-white"
+                                          className={`px-5 py-2.5 rounded-full transition-all duration-200 text-sm font-semibold shadow-md hover:shadow-lg ${selectedCourse?.id === course.id
+                                                ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
                                                 : "bg-blue-500 hover:bg-blue-600 text-white"
                                              }`}
                                        >
-                                          {selectedCourse?.id === course.id ? "✓ Wybrany" : "Wybierz"}
+                                          {selectedCourse?.id === course.id ? "Wybrany" : "Wybierz"}
                                        </button>
                                     </div>
 
@@ -381,7 +398,6 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                      </h2>
                      {loading ? (
                         <div className="text-center py-12">
-                           <div className="text-4xl mb-4 animate-spin">⏳</div>
                            <p className="text-slate-600">Ładowanie...</p>
                         </div>
                      ) : (
@@ -441,14 +457,16 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                         <div className="space-y-4">
                            <div className="grid grid-cols-2 gap-4">
                               <div>
-                                 <label className="block text-sm font-medium text-slate-700 mb-2">
+                                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Tytuł kursu *
                                  </label>
                                  <input
                                     type="text"
                                     value={newCourse.title}
                                     onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-                                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 
+                                             focus:ring-0 focus:border-blue-500 outline-none
+                                             transition-all duration-200 bg-white hover:border-slate-300"
                                     placeholder="np. Python dla początkujących"
                                  />
                               </div>
@@ -529,7 +547,10 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                            <button
                               onClick={handleCreateCourse}
                               disabled={!newCourse.title}
-                              className="w-full py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-slate-300 text-white font-semibold rounded-lg transition shadow-md"
+                              className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 
+                                       hover:from-blue-700 hover:to-cyan-700 disabled:from-slate-300 
+                                       disabled:to-slate-300 text-white font-bold rounded-full 
+                                       transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
                            >
                               Utwórz kurs
                            </button>
@@ -592,7 +613,10 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                               <button
                                  onClick={handleCreateModule}
                                  disabled={!newModule.title}
-                                 className="w-full py-3 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white font-semibold rounded-lg transition shadow-md"
+                                 className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 
+                                          hover:from-green-700 hover:to-emerald-700 disabled:from-slate-300 
+                                          disabled:to-slate-300 text-white font-bold rounded-full 
+                                          transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
                               >
                                  Dodaj moduł
                               </button>
@@ -852,6 +876,42 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                                  />
                               </div>
 
+                              <div>
+                                 <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Przykładowy kod
+                                 </label>
+                                 <textarea
+                                    value={newLesson.exampleCode}
+                                    onChange={(e) =>
+                                       setNewLesson({
+                                          ...newLesson,
+                                          exampleCode: e.target.value,
+                                       })
+                                    }
+                                    rows={5}
+                                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none font-mono text-sm resize-none"
+                                    placeholder="# Przykładowy kod do wyświetlenia uczniowi jako odniesienie"
+                                 />
+                              </div>
+
+                              <div>
+                                 <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Opis przykładowego kodu
+                                 </label>
+                                 <input
+                                    type="text"
+                                    value={newLesson.exampleDescription}
+                                    onChange={(e) =>
+                                       setNewLesson({
+                                          ...newLesson,
+                                          exampleDescription: e.target.value,
+                                       })
+                                    }
+                                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none"
+                                    placeholder="np. 'Zobacz jak używa się funkcji print()'"
+                                 />
+                              </div>
+
                               <div className="grid grid-cols-2 gap-4">
                                  <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -894,17 +954,20 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                         )}
 
                         {/* Action buttons */}
-                        <div className="flex gap-4 pt-4 border-t border-slate-200">
+                        <div className="flex gap-4 pt-6 border-t border-slate-200">
                            <button
                               type="submit"
-                              className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold rounded-lg transition shadow-md hover:shadow-lg"
+                              className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 
+                                       hover:from-purple-700 hover:to-indigo-700 text-white font-bold 
+                                       rounded-full transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
                            >
                               Utwórz lekcję
                            </button>
                            <button
                               type="button"
                               onClick={() => setActiveTab("courses")}
-                              className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition"
+                              className="px-8 py-4 bg-slate-200 hover:bg-slate-300 text-slate-700 
+                                       font-semibold rounded-full transition-all duration-200"
                            >
                               Anuluj
                            </button>

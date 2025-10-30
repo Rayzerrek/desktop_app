@@ -1,5 +1,6 @@
 import { Course } from "../types/lesson";
 import { lessonService } from "../services/LessonService";
+import { progressService, UserProgress } from "../services/ProgressService";
 import { JSX, useEffect, useState } from "react";
 import { SiPython, SiJavascript, SiHtml5, SiCss3, SiTypescript} from "react-icons/si";
 import { DiJava } from "react-icons/di";
@@ -15,9 +16,11 @@ export default function CourseDashboard({
 }: CourseDashboardProps) {
    const [courses, setCourses] = useState<Course[]>([]);
    const [loading, setLoading] = useState(true);
+   const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
 
    useEffect(() => {
       loadCourses();
+      loadProgress();
    }, []);
 
    const loadCourses = async () => {
@@ -29,6 +32,25 @@ export default function CourseDashboard({
       } finally {
          setLoading(false);
       }
+   };
+
+   const loadProgress = async () => {
+      try {
+         const userId = localStorage.getItem("user_id");
+         if (userId) {
+            const progress = await progressService.getUserProgress(userId);
+            setUserProgress(progress);
+         }
+      } catch (error) {
+         console.error("Error loading progress:", error);
+      }
+   };
+
+   const getCourseProgress = (course: Course): number => {
+      const lessonIds = course.modules.flatMap(module => 
+         module.lessons.map(lesson => lesson.id)
+      );
+      return progressService.calculateCourseProgress(userProgress, lessonIds);
    };
    const getCourseIcon = (language: string): JSX.Element | null => {
       const courseIcons: Record<string, JSX.Element> = {
@@ -79,10 +101,10 @@ export default function CourseDashboard({
    };
 
    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center mb-8">
-               <h1 className="text-5xl font-bold text-slate-800 mb-4">
+            <div className="text-center mb-12">
+               <h1 className="text-6xl font-bold text-slate-900 mb-4 tracking-tight">
                   Wybierz swój kurs
                </h1>
                <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
@@ -100,12 +122,15 @@ export default function CourseDashboard({
                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                {courses.map((course: Course) => (
                   <div
                      key={course.id}
                      onClick={() => onCourseSelect(course.id)}
-                     className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-105 hover:-translate-y-1"
+                     className="group bg-white rounded-3xl shadow-xl border border-slate-100 p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:-translate-y-1"
+                     style={{
+                        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
+                     }}
                   >
                      <div className="flex items-start justify-between mb-4">
                         <div
@@ -123,62 +148,70 @@ export default function CourseDashboard({
                         </span>
                      </div>
 
-                     <h3 className="text-2xl font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
+                     <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
                         {course.title}
                      </h3>
 
-                     <p className="text-slate-600 mb-4 line-clamp-2">
+                     <p className="text-slate-600 mb-4 line-clamp-2 leading-relaxed">
                         {course.description}
                      </p>
 
                      <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
                         <div className="flex items-center gap-1">
-                           <span>
+                           <span className="font-medium">
                               {countLessons(course)} lekcji
                            </span>
                         </div>
                         {course.estimatedHours && (
                            <div className="flex items-center gap-1">
-                              <span>⏱️</span>
-                              <span>{course.estimatedHours}h</span>
+                              <span className="font-medium">{course.estimatedHours}h</span>
                            </div>
                         )}
                      </div>
 
-                     <div className="w-full bg-slate-100 rounded-full h-2 mb-3">
+                     <div className="w-full bg-slate-100 rounded-full h-2 mb-4">
                         <div
                            className="h-2 rounded-full transition-all duration-500"
                            style={{
-                              width: "0%",
+                              width: `${getCourseProgress(course)}%`,
                               backgroundColor: course.color,
                            }}
                         ></div>
                      </div>
+                     
+                     {getCourseProgress(course) > 0 && (
+                        <p className="text-xs text-slate-500 mb-2 text-center">
+                           Ukończono: {getCourseProgress(course)}%
+                        </p>
+                     )}
 
                      <button
-                        className="w-full py-3 rounded-lg font-semibold transition-all duration-200 text-white shadow-md hover:shadow-lg"
+                        className="w-full py-3 rounded-2xl font-bold transition-all duration-200 text-white shadow-md hover:shadow-xl"
                         style={{
                            background: `linear-gradient(135deg, ${course.color} 0%, ${course.color}dd 100%)`,
                         }}
                      >
-                        Rozpocznij kurs →
+                        Rozpocznij kurs
                      </button>
                   </div>
                ))}
             </div>
 
             <div className="mt-16 text-center">
-               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 max-w-2xl mx-auto">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-4">
+               <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-10 max-w-2xl mx-auto"
+                    style={{
+                       boxShadow: '0 12px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)'
+                    }}>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-4">
                      Nie wiesz od czego zacząć?
                   </h2>
-                  <p className="text-slate-600 mb-6">
+                  <p className="text-slate-600 mb-6 text-lg leading-relaxed">
                      Polecamy zacząć od kursu Python - idealny dla osób, które
                      dopiero rozpoczynają swoją przygodę z programowaniem!
                   </p>
                   <button
                      onClick={() => onCourseSelect("course-python")}
-                     className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                     className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                      Zacznij od Pythona
                   </button>
@@ -186,28 +219,37 @@ export default function CourseDashboard({
             </div>
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="font-semibold text-slate-800 mb-2">
+               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100"
+                    style={{
+                       boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)'
+                    }}>
+                  <h3 className="font-bold text-slate-900 mb-2 text-lg">
                      Nauka przez praktykę
                   </h3>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                      Pisz kod bezpośrednio w przeglądarce i zobacz efekty na
                      żywo
                   </p>
                </div>
-               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="font-semibold text-slate-800 mb-2">
+               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100"
+                    style={{
+                       boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)'
+                    }}>
+                  <h3 className="font-bold text-slate-900 mb-2 text-lg">
                      System XP i osiągnięć
                   </h3>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                      Zdobywaj punkty i odblokuj nowe wyzwania
                   </p>
                </div>
-               <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="font-semibold text-slate-800 mb-2">
+               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100"
+                    style={{
+                       boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)'
+                    }}>
+                  <h3 className="font-bold text-slate-900 mb-2 text-lg">
                      Utrzymuj streak
                   </h3>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                      Ucz się codziennie i buduj swoją passę
                   </p>
                </div>

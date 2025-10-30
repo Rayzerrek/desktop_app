@@ -37,3 +37,9 @@ export const findCourseByLessonId = (courses:Course[], lessonId:string):Course |
         }
     }
 }
+
+export const getAllLessonIds = (course: Course): string[] => {
+    return course.modules.flatMap(module => 
+        module.lessons.map(lesson => lesson.id)
+    );
+}

@@ -147,3 +147,26 @@ pub struct CreateLessonInput {
     #[serde(alias = "estimatedMinutes")]
     pub estimated_minutes: Option<i32>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct UserProgress {
+    pub id: Option<String>,
+    pub user_id: String,
+    pub lesson_id: String,
+    pub status: String,
+    pub score: Option<i32>,
+    pub attempts: i32,
+    pub completed_at: Option<String>,
+    pub time_spent_seconds: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateProgressInput {
+    pub user_id: String,
+    pub lesson_id: String,
+    pub status: String,
+    pub score: Option<i32>,
+    pub attempts: i32,
+    pub completed_at: Option<String>,
+    pub time_spent_seconds: Option<i32>,
+}

@@ -150,36 +150,39 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
                onClose={() => setToast(null)}
             />
          )}
-         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 w-full max-w-md p-8">
+         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md p-8"
+                 style={{
+                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.08)'
+                 }}>
                <div className="text-center mb-8">
-                  <h1 className="text-3xl font-bold text-slate-800 mb-2">
+                  <h1 className="text-4xl font-bold text-slate-900 mb-2">
                      {isLogin ? "Witaj ponownie!" : "Dołącz do nas!"}
                   </h1>
-                  <p className="text-slate-600">
+                  <p className="text-slate-600 text-lg">
                      {isLogin
                         ? "Zaloguj się, aby kontynuować naukę"
                         : "Stwórz konto i zacznij swoją przygodę"}
                   </p>
                </div>
 
-               <div className="flex gap-2 mb-8 bg-slate-100/50 rounded-lg p-1">
+               <div className="flex gap-2 mb-8 bg-slate-100 rounded-full p-1.5">
                   <button
                      onClick={() => setIsLogin(true)}
-                     className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+                     className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${
                         isLogin
-                           ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md"
-                           : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                           ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
+                           : "text-slate-600 hover:text-slate-800 hover:bg-white"
                      }`}
                   >
                      Logowanie
                   </button>
                   <button
                      onClick={() => setIsLogin(false)}
-                     className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+                     className={`flex-1 py-3 px-4 rounded-full font-semibold transition-all duration-300 ${
                         !isLogin
-                           ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md"
-                           : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                           ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-md"
+                           : "text-slate-600 hover:text-slate-800 hover:bg-white"
                      }`}
                   >
                      Rejestracja
@@ -211,7 +214,7 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
                   <button
                      onClick={handleGoogleLogin}
                      disabled={loading}
-                     className="mt-4 w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                     className="mt-4 w-full flex items-center justify-center gap-3 px-4 py-4 border-2 border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                   >
                      <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path
