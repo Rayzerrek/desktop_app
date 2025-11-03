@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect } from 'react'
 
-export type ToastType = "success" | "error" | "info" | "warning";
+export type ToastType = 'success' | 'error' | 'info' | 'warning'
 
 interface ToastProps {
-  message: string;
-  type: ToastType;
-  onClose: () => void;
-  duration?: number;
+  message: string
+  type: ToastType
+  onClose: () => void
+  duration?: number
 }
 
 export default function Toast({
@@ -17,25 +17,25 @@ export default function Toast({
 }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose();
-    }, duration);
+      onClose()
+    }, duration)
 
-    return () => clearTimeout(timer);
-  }, [duration, onClose]);
+    return () => clearTimeout(timer)
+  }, [duration, onClose])
 
   const icons = {
-    success: "✓",
-    error: "✕",
-    info: "ℹ",
-    warning: "⚠",
-  };
+    success: '✓',
+    error: '✕',
+    info: 'ℹ',
+    warning: '⚠',
+  }
 
   const colors = {
-    success: "bg-green-500",
-    error: "bg-red-500",
-    info: "bg-blue-500",
-    warning: "bg-yellow-500",
-  };
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    info: 'bg-blue-500',
+    warning: 'bg-yellow-500',
+  }
 
   return (
     <div className="fixed top-4 right-4 z-50 animate-slide-in">
@@ -55,5 +55,5 @@ export default function Toast({
         </button>
       </div>
     </div>
-  );
+  )
 }
