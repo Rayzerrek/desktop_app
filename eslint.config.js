@@ -1,4 +1,3 @@
-// Minimal ESLint flat config — keeps linting simple and avoids plugin import/runtime issues
 import js from '@eslint/js'
 import globals from 'globals'
 

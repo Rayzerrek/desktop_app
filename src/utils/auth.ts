@@ -1,10 +1,11 @@
-export type Tokens = {
+type Tokens = {
   access_token?: string
   refresh_token?: string
   user_id?: string
 }
 
-export function saveAuthTokens(tokens: Tokens) {
+
+function saveAuthTokens(tokens: Tokens) {
   if (tokens.access_token) {
     localStorage.setItem('access_token', tokens.access_token)
   }
@@ -16,11 +17,17 @@ export function saveAuthTokens(tokens: Tokens) {
   }
 }
 
-export function clearAuthTokens() {
+function clearAuthTokens() {
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
   localStorage.removeItem('user_id')
 }
-export function isAuthenticated(): boolean {
+function isAuthenticated(): boolean {
   return !!localStorage.getItem('access_token')
+}
+
+export {
+  saveAuthTokens,
+  clearAuthTokens,
+  isAuthenticated
 }

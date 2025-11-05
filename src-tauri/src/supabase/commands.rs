@@ -212,7 +212,6 @@ pub async fn search_lessons(
 ) -> Result<Vec<SearchResult>, String> {
     let client = get_supabase_client()?;
 
-    // Encode query properly - don't add wildcards before encoding
     let encoded_query = urlencoding::encode(&query);
     
     let courses_endpoint = format!(
@@ -314,7 +313,6 @@ pub async fn update_lesson_progress(
 ) -> Result<UserProgress, String> {
     let client = get_supabase_client()?;
 
-    // Check if progress already exists
     let existing: Vec<UserProgress> = client
         .rest_request(
             Method::GET,
@@ -329,7 +327,6 @@ pub async fn update_lesson_progress(
         .unwrap_or_default();
 
     if let Some(existing_progress) = existing.first() {
-        // Update existing progress
         let body = json!({
             "status": progress.status,
             "score": progress.score,
@@ -352,7 +349,6 @@ pub async fn update_lesson_progress(
             .next()
             .ok_or_else(|| "Failed to update progress".to_string())
     } else {
-        // Create new progress
         let body = json!({
             "user_id": progress.user_id,
             "lesson_id": progress.lesson_id,

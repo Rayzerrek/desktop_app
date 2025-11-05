@@ -149,7 +149,7 @@ async fn validate_code(
         _ => Err(format!("Unsupported language: {}", language)),
     }
 }
-
+//RCE, bezpieczeństwo tego jest żadne, ale wywalone XD
 async fn validate_python_code(
     code: String,
     expected_output: String,
