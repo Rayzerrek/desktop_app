@@ -94,9 +94,6 @@ function App() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-slate-800">Brak dostępu</h1>
-            <p className="text-slate-600 mt-2">
-              Tylko administratorzy mogą tutaj wejść
-            </p>
           </div>
         </div>
       )
@@ -178,8 +175,8 @@ function App() {
         access_token?: string
         refresh_token?: string
       }>('login_user', {
-        email: 'rayserrek@gmail.com',
-        password: 'Kacper1234!',
+        email: import.meta.env.VITE_DEV_LOGIN,
+        password: import.meta.env.VITE_DEV_PASS,
       })
 
       if (response.success) {

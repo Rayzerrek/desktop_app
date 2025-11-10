@@ -4,7 +4,6 @@ type Tokens = {
   user_id?: string
 }
 
-
 function saveAuthTokens(tokens: Tokens) {
   if (tokens.access_token) {
     localStorage.setItem('access_token', tokens.access_token)
@@ -26,8 +25,4 @@ function isAuthenticated(): boolean {
   return !!localStorage.getItem('access_token')
 }
 
-export {
-  saveAuthTokens,
-  clearAuthTokens,
-  isAuthenticated
-}
+export { saveAuthTokens, clearAuthTokens, isAuthenticated }

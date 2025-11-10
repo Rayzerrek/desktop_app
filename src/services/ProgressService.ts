@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 
-export interface UserProgress {
+interface UserProgress {
   id?: string
   user_id: string
   lesson_id: string
@@ -11,7 +11,7 @@ export interface UserProgress {
   time_spent_seconds?: number
 }
 
-export interface CreateProgressInput {
+interface CreateProgressInput {
   user_id: string
   lesson_id: string
   status: string
@@ -101,3 +101,5 @@ class ProgressService {
 }
 
 export const progressService = new ProgressService()
+
+export type { UserProgress, CreateProgressInput }

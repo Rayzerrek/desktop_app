@@ -133,7 +133,7 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
       }
     } catch (error) {
       setToast({
-        message: 'Błąd podczas rejestracji: ' + error,
+        message: 'Błąd podczas rejestracjid: ' + error,
         type: 'error',
       })
     } finally {

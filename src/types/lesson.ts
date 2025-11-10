@@ -85,7 +85,7 @@ interface Lesson {
   description?: string
   lessonType: LessonType
   content: LessonContent
-  language: 'python' | 'javascript' | 'html' | 'css' | 'typescript'
+  language: Language
   xp_reward: number
   orderIndex: number
   isLocked?: boolean
@@ -105,7 +105,7 @@ interface Course {
   id: string
   title: string
   description: string
-  difficulty: 'beginner' | 'intermediate' | 'advanced'
+  difficulty: Difficulty
   language: string
   modules: Module[]
   color: string
@@ -125,7 +125,6 @@ interface UserProgress {
 type Difficulty = 'beginner' | 'intermediate' | 'advanced'
 type LessonType = 'theory' | 'exercise' | 'quiz' | 'project'
 type Language = 'python' | 'javascript' | 'html' | 'css' | 'typescript'
-
 interface UserCourseProgress {
   courseId: string
   progress: UserProgress[]
