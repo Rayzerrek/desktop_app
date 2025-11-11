@@ -213,7 +213,10 @@ function App() {
         DEV: Skip to Dashboard
       </button>
       <AuthPanel onLoginSuccess={login} />
+    
     </div>
+    
+  
   )
 }
 

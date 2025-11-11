@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import CourseGrid from './CourseGrid'
 import '@testing-library/jest-dom/vitest'
+import { Course } from '../types/lesson'
 
 describe('CourseGrid', () => {
   it('renders course cards and progress', () => {
-    const courses = [
+    const courses: Course[] = [
       {
         id: 'c1',
         title: 'Course One',
