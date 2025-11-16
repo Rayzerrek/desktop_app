@@ -122,7 +122,8 @@ export default function CodePlayground({ onBack }: CodePlaygroundProps) {
           options={{
             minimap: { enabled: false },
             fontSize: 14,
-            fontFamily: "'Fira Code', 'Consolas', 'Courier New', monospace",
+            fontFamily: 'Consolas, "Courier New", monospace',
+            fontLigatures: false,
             automaticLayout: true,
             wordWrap: 'on',
             matchBrackets: 'always',
@@ -139,6 +140,7 @@ export default function CodePlayground({ onBack }: CodePlaygroundProps) {
               verticalScrollbarSize: 10,
               horizontalScrollbarSize: 10,
             },
+            fixedOverflowWidgets: true,
           }}
         />
       </div>

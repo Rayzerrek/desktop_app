@@ -4,6 +4,7 @@ import { lessonService } from '../services/LessonService'
 import { progressService, UserProgress } from '../services/ProgressService'
 import CourseGrid from './CourseGrid'
 import SearchBar from './Searchbar'
+import Button from './ui/Button'
 
 interface CourseTabsProps {
   onCourseSelect: (courseId: string) => void
@@ -113,26 +114,24 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
         </div>
 
         <div className="flex gap-4 mb-8 bg-white rounded-2xl p-2 shadow-lg w-full">
-          <button
+          <Button
             onClick={() => setActiveTab('overview')}
-            className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 text-lg ${
-              activeTab === 'overview'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
-            }`}
+            variant={activeTab === 'overview' ? 'primary' : 'secondary'}
+            size="lg"
+            fullWidth
+            className={activeTab === 'overview' ? '' : '!bg-transparent !text-slate-600 hover:!text-slate-800 hover:!bg-slate-50 !shadow-none'}
           >
             Przegląd
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab('all')}
-            className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 text-lg ${
-              activeTab === 'all'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
-            }`}
+            variant={activeTab === 'all' ? 'primary' : 'secondary'}
+            size="lg"
+            fullWidth
+            className={activeTab === 'all' ? '' : '!bg-transparent !text-slate-600 hover:!text-slate-800 hover:!bg-slate-50 !shadow-none'}
           >
             Wszystkie kursy
-          </button>
+          </Button>
         </div>
 
         {activeTab === 'overview' ? (

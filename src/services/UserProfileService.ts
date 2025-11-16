@@ -1,23 +1,23 @@
 import { invoke } from '@tauri-apps/api/core'
 
 interface UserProfile {
-  id: string;
-  email: string;
-  username?: string;
-  avatar_url?: string;
-  total_xp: number;
-  level: number;
-  current_streak_days: number;
-  longest_streak_days: number;
-  joined_at: string;
+  id: string
+  email: string
+  username?: string
+  avatar_url?: string
+  total_xp: number
+  level: number
+  current_streak_days: number
+  longest_streak_days: number
+  joined_at: string
 }
 
 interface UserStatistics {
-  total_lessons_completed: number;
-  total_courses_completed: number;
-  total_minutes_spent: number;
-  average_score: number;
-  lessons_this_week: number;
+  total_lessons_completed: number
+  total_courses_completed: number
+  total_minutes_spent: number
+  average_score: number
+  lessons_this_week: number
 }
 
 export class UserProfileService {
@@ -49,6 +49,7 @@ export class UserProfileService {
       accessToken: token,
     })
   }
+
   async updateUsername(userId: string, username: string): Promise<void> {
     const token = localStorage.getItem('access_token')
     if (!token) throw new Error('No access token')
@@ -59,6 +60,7 @@ export class UserProfileService {
     })
   }
 }
+
 export const userProfileService = new UserProfileService()
 
 export type { UserProfile, UserStatistics }

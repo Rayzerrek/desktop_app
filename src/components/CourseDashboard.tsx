@@ -76,7 +76,7 @@ export default function CourseDashboard({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12 mt-8">
+        <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-slate-900 mb-4 tracking-tight">
             Wybierz swój kurs
           </h1>

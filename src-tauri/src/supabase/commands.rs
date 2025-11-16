@@ -5,7 +5,7 @@ use super::{
     client::SupabaseClient,
     config::get_supabase_config,
     types::{
-        Course, CourseRow, CreateCourseInput, CreateLessonInput, CreateModuleInput, 
+        Course, CourseRow, CreateCourseInput, CreateLessonInput, CreateModuleInput,
         CreateProgressInput, Lesson, Module, ModuleRow, SearchResult, UserProgress,
     },
 };
@@ -213,7 +213,7 @@ pub async fn search_lessons(
     let client = get_supabase_client()?;
 
     let encoded_query = urlencoding::encode(&query);
-    
+
     let courses_endpoint = format!(
         "courses?select=id,title,description&or=(title.ilike.*{}*,description.ilike.*{}*)&is_published=eq.true&limit=5",
         encoded_query,
@@ -298,9 +298,9 @@ pub async fn get_user_progress(
     access_token: String,
 ) -> Result<Vec<UserProgress>, String> {
     let client = get_supabase_client()?;
-    
+
     let endpoint = format!("user_progress?select=*&user_id=eq.{}", user_id);
-    
+
     client
         .rest_request(Method::GET, &endpoint, &access_token, None)
         .await
@@ -338,7 +338,10 @@ pub async fn update_lesson_progress(
         let updated: Vec<UserProgress> = client
             .rest_request(
                 Method::PATCH,
-                &format!("user_progress?id=eq.{}", existing_progress.id.as_ref().unwrap()),
+                &format!(
+                    "user_progress?id=eq.{}",
+                    existing_progress.id.as_ref().unwrap()
+                ),
                 &access_token,
                 Some(body),
             )
@@ -368,4 +371,133 @@ pub async fn update_lesson_progress(
             .next()
             .ok_or_else(|| "Failed to create progress".to_string())
     }
+}
+
+#[tauri::command]
+pub async fn get_user_profile(user_id: String, access_token: String) -> Result<Value, String> {
+    let client = get_supabase_client()?;
+
+    let endpoint = format!("profiles?select=*&id=eq.{}", user_id);
+
+    let profiles: Vec<Value> = client
+        .rest_request(Method::GET, &endpoint, &access_token, None)
+        .await?;
+
+    profiles
+        .into_iter()
+        .next()
+        .ok_or_else(|| "Profile not found".to_string())
+}
+
+#[tauri::command]
+pub async fn get_user_statistics(user_id: String, access_token: String) -> Result<Value, String> {
+    let client = get_supabase_client()?;
+
+    let completed_lessons: Vec<UserProgress> = client
+        .rest_request(
+            Method::GET,
+            &format!(
+                "user_progress?select=*&user_id=eq.{}&status=eq.completed",
+                user_id
+            ),
+            &access_token,
+            None,
+        )
+        .await
+        .unwrap_or_default();
+
+    let total_lessons_completed = completed_lessons.len();
+    let total_minutes_spent: i32 = completed_lessons
+        .iter()
+        .filter_map(|p| p.time_spent_seconds)
+        .sum::<i32>()
+        / 60;
+
+    let average_score = if !completed_lessons.is_empty() {
+        let total_score: i32 = completed_lessons.iter().filter_map(|p| p.score).sum();
+        total_score / completed_lessons.len() as i32
+    } else {
+        0
+    };
+
+    Ok(json!({
+        "total_lessons_completed": total_lessons_completed,
+        "total_courses_completed": 0, // TODO: implement course completion logic
+        "total_minutes_spent": total_minutes_spent,
+        "average_score": average_score,
+    }))
+}
+
+#[tauri::command]
+pub async fn get_user_achievements(
+    user_id: String,
+    access_token: String,
+) -> Result<Vec<Value>, String> {
+    let client = get_supabase_client()?;
+
+    let endpoint = format!(
+        "user_achievements?select=*,achievements(*)&user_id=eq.{}",
+        user_id
+    );
+
+    client
+        .rest_request(Method::GET, &endpoint, &access_token, None)
+        .await
+}
+
+#[tauri::command]
+pub async fn get_available_achievements(access_token: String) -> Result<Vec<Value>, String> {
+    let client = get_supabase_client()?;
+
+    client
+        .rest_request(Method::GET, "achievements?select=*", &access_token, None)
+        .await
+}
+
+#[tauri::command]
+pub async fn update_user_avatar(
+    user_id: String,
+    avatar_url: String,
+    access_token: String,
+) -> Result<(), String> {
+    let client = get_supabase_client()?;
+
+    let body = json!({
+        "avatar_url": avatar_url,
+    });
+
+    let _: Vec<Value> = client
+        .rest_request(
+            Method::PATCH,
+            &format!("profiles?id=eq.{}", user_id),
+            &access_token,
+            Some(body),
+        )
+        .await?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn update_user_username(
+    user_id: String,
+    username: String,
+    access_token: String,
+) -> Result<(), String> {
+    let client = get_supabase_client()?;
+
+    let body = json!({
+        "username": username,
+    });
+
+    let _: Vec<Value> = client
+        .rest_request(
+            Method::PATCH,
+            &format!("profiles?id=eq.{}", user_id),
+            &access_token,
+            Some(body),
+        )
+        .await?;
+
+    Ok(())
 }

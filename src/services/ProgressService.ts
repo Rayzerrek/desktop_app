@@ -1,27 +1,27 @@
 import { invoke } from '@tauri-apps/api/core'
 
 interface UserProgress {
-  id?: string;
-  user_id: string;
-  lesson_id: string;
-  status: 'not_started' | 'in_progress' | 'completed';
-  score?: number;
-  attempts: number;
-  completed_at?: string;
-  time_spent_seconds?: number;
+  id?: string
+  user_id: string
+  lesson_id: string
+  status: 'not_started' | 'in_progress' | 'completed'
+  score?: number
+  attempts: number
+  completed_at?: string
+  time_spent_seconds?: number
 }
 
 interface CreateProgressInput {
-  user_id: string;
-  lesson_id: string;
-  status: string;
-  score?: number;
-  attempts: number;
-  completed_at?: string;
-  time_spent_seconds?: number;
+  user_id: string
+  lesson_id: string
+  status: string
+  score?: number
+  attempts: number
+  completed_at?: string
+  time_spent_seconds?: number
 }
 
-class ProgressService {
+export class ProgressService {
   async getUserProgress(userId: string): Promise<UserProgress[]> {
     const token = localStorage.getItem('access_token')
     if (!token) {
