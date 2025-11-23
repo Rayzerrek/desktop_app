@@ -31,6 +31,9 @@ export default function LessonDemo({
   const [course, setCourse] = useState<Course | null>(null)
   const [loading, setLoading] = useState(true)
 
+
+
+
   useEffect(() => {
     loadLesson()
   }, [lessonId])
@@ -56,7 +59,6 @@ export default function LessonDemo({
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4 animate-spin">⏳</div>
           <p className="text-xl text-slate-600">Ładowanie lekcji...</p>
         </div>
       </div>
@@ -67,7 +69,6 @@ export default function LessonDemo({
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
           <p className="text-xl text-slate-600">Lekcja nie znaleziona</p>
         </div>
       </div>
