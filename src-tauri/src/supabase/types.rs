@@ -170,3 +170,14 @@ pub struct CreateProgressInput {
     pub completed_at: Option<String>,
     pub time_spent_seconds: Option<i32>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserProfile {
+    pub id: String,
+    pub email: Option<String>,
+    pub username: Option<String>,
+    pub avatar_url: Option<String>,
+    pub total_xp: Option<i32>,
+    pub level:Option<i32>,
+    
+}

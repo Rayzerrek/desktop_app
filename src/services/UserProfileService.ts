@@ -25,10 +25,19 @@ export class UserProfileService {
     const token = localStorage.getItem('access_token')
     if (!token) throw new Error('No access token')
 
-    return await invoke<UserProfile>('get_user_profile', {
+    const profile = await invoke<UserProfile>('get_user_profile', {
       userId,
       accessToken: token,
     })
+
+    // Zapewniamy domyślne wartości jeśli backend zwróci null
+    return {
+      ...profile,
+      total_xp: profile.total_xp ?? 0,
+      level: profile.level ?? 1,
+      current_streak_days: profile.current_streak_days ?? 0,
+      longest_streak_days: profile.longest_streak_days ?? 0,
+    }
   }
 
   async getUserStatistics(userId: string): Promise<UserStatistics> {

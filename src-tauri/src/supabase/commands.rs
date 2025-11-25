@@ -1,6 +1,8 @@
 use reqwest::Method;
 use serde_json::{json, Value};
 
+use crate::supabase::types::UserProfile;
+
 use super::{
     client::SupabaseClient,
     config::get_supabase_config,
@@ -374,19 +376,48 @@ pub async fn update_lesson_progress(
 }
 
 #[tauri::command]
-pub async fn get_user_profile(user_id: String, access_token: String) -> Result<Value, String> {
+pub async fn get_user_profile(user_id: String, access_token: String) -> Result<UserProfile, String> {
     let client = get_supabase_client()?;
 
     let endpoint = format!("profiles?select=*&id=eq.{}", user_id);
-
-    let profiles: Vec<Value> = client
+    let profiles: Vec<UserProfile> = client
         .rest_request(Method::GET, &endpoint, &access_token, None)
         .await?;
 
-    profiles
+    let mut profile = profiles
         .into_iter()
         .next()
-        .ok_or_else(|| "Profile not found".to_string())
+        .ok_or_else(|| "Profile not found".to_string())?;
+
+    let completed_lessons: Vec<Value> = client
+        .rest_request(
+            Method::GET,
+            &format!(
+                "user_progress?select=lesson_id,lessons(xp_reward)&user_id=eq.{}&status=eq.completed",
+                user_id
+            ),
+            &access_token,
+            None,
+        )
+        .await
+        .unwrap_or_default();
+
+    let total_xp: i32 = completed_lessons
+        .iter()
+        .filter_map(|progress| {
+            progress.get("lessons")
+                .and_then(|l| l.get("xp_reward"))
+                .and_then(|xp| xp.as_i64())
+                .map(|xp| xp as i32)
+        })
+        .sum();
+
+    let level = (total_xp / 1000) + 1;
+
+    profile.total_xp = Some(total_xp);
+    profile.level = Some(level);
+
+    Ok(profile)
 }
 
 #[tauri::command]
@@ -413,18 +444,11 @@ pub async fn get_user_statistics(user_id: String, access_token: String) -> Resul
         .sum::<i32>()
         / 60;
 
-    let average_score = if !completed_lessons.is_empty() {
-        let total_score: i32 = completed_lessons.iter().filter_map(|p| p.score).sum();
-        total_score / completed_lessons.len() as i32
-    } else {
-        0
-    };
 
     Ok(json!({
         "total_lessons_completed": total_lessons_completed,
         "total_courses_completed": 0, // TODO: implement course completion logic
         "total_minutes_spent": total_minutes_spent,
-        "average_score": average_score,
     }))
 }
 

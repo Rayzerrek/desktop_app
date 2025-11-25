@@ -1,5 +1,5 @@
 import Editor from '@monaco-editor/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getFileNameForLanguage } from '../utils/courseUtils'
 
 interface CodeEditorProps {
@@ -23,6 +23,9 @@ export default function CodeEditor({
 }: CodeEditorProps) {
   const [code, setCode] = useState(initialCode)
   const [isRunning, setIsRunning] = useState(false)
+
+
+  
 
   const handleEditorChange = (value: string | undefined) => {
     const newCode = value || ''

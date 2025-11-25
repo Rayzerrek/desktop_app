@@ -1,4 +1,4 @@
-import { useState, JSX } from 'react'
+import { useState, JSX, useEffect } from 'react'
 import { Editor } from '@monaco-editor/react'
 import { invoke } from '@tauri-apps/api/core'
 import {
@@ -10,11 +10,8 @@ import {
 } from 'react-icons/si'
 import { DiJava } from 'react-icons/di'
 
-interface CodePlaygroundProps {
-  onBack?: () => void
-}
 
-export default function CodePlayground({ onBack }: CodePlaygroundProps) {
+export default function CodePlayground({ onBack }: {onBack?: () => void}) {
   const [code, setCode] = useState<string>('')
   const [language, setLanguage] = useState<string>('python')
   const [output, setOutput] = useState<string>('')
@@ -59,6 +56,20 @@ export default function CodePlayground({ onBack }: CodePlaygroundProps) {
       setIsRunning(false)
     }
   }
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F5' || (e.altKey && e.key === 'Enter')){
+        e.preventDefault();
+        handleRun();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [code, language])
 
   return (
     <div className="h-screen flex flex-col bg-[#1e1e1e]">

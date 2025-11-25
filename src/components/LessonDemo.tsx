@@ -25,6 +25,7 @@ export default function LessonDemo({
   onNextLesson,
 }: LessonDemoProps) {
   const [output, setOutput] = useState<string>('')
+  const [currentCode, setCurrentCode] = useState<string>('') // Przechowuje aktualny kod z edytora
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [lesson, setLesson] = useState<Lesson | null>(null)
@@ -37,6 +38,19 @@ export default function LessonDemo({
   useEffect(() => {
     loadLesson()
   }, [lessonId])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === 'Enter') {
+        e.preventDefault()
+        handleRunCode(currentCode)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [currentCode])
 
   const loadLesson = async () => {
     try {
@@ -261,6 +275,7 @@ export default function LessonDemo({
                 <CodeEditor
                   initialCode={starterCode}
                   language={lesson.language}
+                  onChange={setCurrentCode}
                   onRun={handleRunCode}
                   height="300px"
                   theme="vs-dark"

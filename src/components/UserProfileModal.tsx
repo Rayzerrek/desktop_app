@@ -128,7 +128,7 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
               ))}
             </div>
           ) : statistics ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-4 mb-8 text-center">
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div className="text-3xl font-bold text-blue-600">
                   {statistics.total_lessons_completed}
@@ -146,12 +146,6 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
                   {statistics.total_minutes_spent}
                 </div>
                 <div className="text-sm text-slate-600">Minut nauki</div>
-              </div>
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                <div className="text-3xl font-bold text-amber-600">
-                  {statistics.average_score}%
-                </div>
-                <div className="text-sm text-slate-600">Średni wynik</div>
               </div>
             </div>
           ) : null}
