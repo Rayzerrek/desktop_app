@@ -25,7 +25,7 @@ export default function LessonDemo({
   onNextLesson,
 }: LessonDemoProps) {
   const [output, setOutput] = useState<string>('')
-  const [currentCode, setCurrentCode] = useState<string>('') // Przechowuje aktualny kod z edytora
+  const [currentCode, setCurrentCode] = useState<string>('') 
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [lesson, setLesson] = useState<Lesson | null>(null)
