@@ -16,6 +16,12 @@ export default function CourseDashboard({
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [userProgress, setUserProgress] = useState<UserProgress[]>([])
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
 
   useEffect(() => {
     loadCourses()
@@ -93,6 +99,7 @@ export default function CourseDashboard({
             />
           </div>
         </div>
+
 
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex gap-4 mb-0 bg-white rounded-2xl p-2 shadow-lg w-full">

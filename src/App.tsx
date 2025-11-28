@@ -12,6 +12,7 @@ import { lessonService } from './services/LessonService'
 import { useAuth } from './hooks/useAuth'
 import { invoke } from '@tauri-apps/api/core'
 import './styles/App.css'
+import ThemeToggle from './components/ThemeToggle'
 
 function AppContent() {
   const { isAuthenticated, isAdmin, refreshAdmin, login, logout } = useAuth()
@@ -21,11 +22,14 @@ function AppContent() {
     type: ToastType
   } | null>(null)
 
+
   useEffect(() => {
     if (isAuthenticated) {
       refreshAdmin()
     }
   }, [isAuthenticated, refreshAdmin])
+
+
 
   const handleDevLogin = async () => {
     try {
@@ -135,6 +139,7 @@ function AppContent() {
             <ProtectedRoute>
               <div>
                 <div className="fixed top-4 right-4 z-50">
+                  <ThemeToggle />
                   <UserProfileDropdown />
                 </div>
 

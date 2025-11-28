@@ -69,6 +69,7 @@ export default function CourseForm({ onSubmit }: CourseFormProps) {
               onChange={(e) =>
                 setNewCourse({ ...newCourse, language: e.target.value })
               }
+              aria-label='Jezyk programowania'
               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="python">Python</option>
@@ -102,6 +103,7 @@ export default function CourseForm({ onSubmit }: CourseFormProps) {
             </label>
             <select
               value={newCourse.difficulty}
+              aria-label='Poziom trudnosci'
               onChange={(e) =>
                 setNewCourse({
                   ...newCourse,

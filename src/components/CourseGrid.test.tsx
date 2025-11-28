@@ -40,7 +40,7 @@ describe('CourseGrid', () => {
     expect(screen.getByText('Course One')).toBeInTheDocument()
     expect(screen.getByText('Course Two')).toBeInTheDocument()
 
-    // Check progress text present
+    
     expect(screen.getByText('20% ukończono')).toBeInTheDocument()
     expect(screen.getByText('75% ukończono')).toBeInTheDocument()
   })

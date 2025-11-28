@@ -31,7 +31,6 @@ export class AchievementService {
       accessToken: token,
     })
 
-    // Wyciągamy achievements z zagnieżdżonej struktury
     return response.map((item) => item.achievements).filter(Boolean)
   }
 

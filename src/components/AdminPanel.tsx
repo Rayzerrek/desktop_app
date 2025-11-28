@@ -11,7 +11,7 @@ import ModuleForm, { NewModuleData } from './Admin-panel/ModuleForm'
 import LessonForm, { NewLessonData } from './Admin-panel/LessonForm'
 
 interface AdminPanelProps {
-  onBack: () => void
+  onBack: () => void;
 }
 
 export default function AdminPanel({ onBack }: AdminPanelProps) {

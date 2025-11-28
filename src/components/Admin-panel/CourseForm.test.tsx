@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CourseForm from './CourseForm'
-import '@testing-library/jest-dom/vitest'
+
+
+beforeEach(() => {
+  vi.clearAllMocks();
+})
 
 describe('CourseForm', () => {
   it('renders all form fields', () => {
@@ -20,7 +24,7 @@ describe('CourseForm', () => {
   it('has submit button disabled when title is empty', () => {
     render(<CourseForm onSubmit={vi.fn()} />)
     
-    const submitButton = screen.getByRole('button', { name: 'Utwórz kurs' })
+    const submitButton = screen.getByRole('button', { name: 'Utwórz kurs'})
     expect(submitButton).toBeDisabled()
   })
 
@@ -46,6 +50,7 @@ describe('CourseForm', () => {
     
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
+        color:'#3B82F6',
         title: 'JavaScript Basics',
         description: 'Learn JS fundamentals',
         difficulty: 'beginner',
@@ -72,15 +77,17 @@ describe('CourseForm', () => {
     const user = userEvent.setup()
     render(<CourseForm onSubmit={onSubmit} />)
     
-    await user.type(screen.getByPlaceholderText('np. Python dla początkujących'), 'JS Course')
-    await user.selectOptions(screen.getByRole('combobox', { name: /Język programowania/i }), 'javascript')
+    await user.type(screen.getByPlaceholderText('np. Python dla początkujących'), 'JavaScript Basics')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Jezyk programowania' }), 'javascript')
     await user.click(screen.getByRole('button', { name: 'Utwórz kurs' }))
     
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
-        language: 'javascript',
+        language:'javascript',
       })
     )
+
+
   })
 
   it('allows selecting different difficulty', async () => {
@@ -89,7 +96,7 @@ describe('CourseForm', () => {
     render(<CourseForm onSubmit={onSubmit} />)
     
     await user.type(screen.getByPlaceholderText('np. Python dla początkujących'), 'Advanced Course')
-    await user.selectOptions(screen.getByRole('combobox', { name: /Poziom trudności/i }), 'advanced')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Poziom trudnosci' }), 'advanced')
     await user.click(screen.getByRole('button', { name: 'Utwórz kurs' }))
     
     expect(onSubmit).toHaveBeenCalledWith(

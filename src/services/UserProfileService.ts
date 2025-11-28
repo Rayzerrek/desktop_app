@@ -30,7 +30,6 @@ export class UserProfileService {
       accessToken: token,
     })
 
-    // Zapewniamy domyślne wartości jeśli backend zwróci null
     return {
       ...profile,
       total_xp: profile.total_xp ?? 0,

@@ -4,13 +4,17 @@ import userEvent from '@testing-library/user-event'
 import AdminPanel from './AdminPanel'
 import '@testing-library/jest-dom/vitest'
 
-// Mock lessonService
-const mockGetCourses = vi.fn()
-const mockCreateCourse = vi.fn()
-const mockCreateModule = vi.fn()
-const mockCreateLesson = vi.fn()
-const mockDeleteCourse = vi.fn()
-const mockDeleteLesson = vi.fn()
+
+
+
+const {mockGetCourses, mockCreateCourse, mockCreateModule, mockCreateLesson, mockDeleteCourse, mockDeleteLesson} = vi.hoisted(() => ({
+  mockGetCourses: vi.fn(),
+  mockCreateCourse: vi.fn(),
+  mockCreateModule: vi.fn(),
+  mockCreateLesson: vi.fn(),
+  mockDeleteCourse: vi.fn(),
+  mockDeleteLesson: vi.fn(),
+}))
 
 vi.mock('../services/LessonService', () => ({
   lessonService: {
@@ -23,7 +27,6 @@ vi.mock('../services/LessonService', () => ({
   },
 }))
 
-// Mock window.confirm
 vi.stubGlobal('confirm', vi.fn(() => true))
 vi.stubGlobal('alert', vi.fn())
 
@@ -94,10 +97,8 @@ describe('AdminPanel', () => {
     it('shows loading state then courses', async () => {
       render(<AdminPanel onBack={() => {}} />)
       
-      // Initially shows loading
       expect(screen.getByText('Ładowanie...')).toBeInTheDocument()
       
-      // After loading, shows courses
       await waitFor(() => {
         expect(screen.getByText('Python Basics')).toBeInTheDocument()
       })
@@ -146,7 +147,7 @@ describe('AdminPanel', () => {
       
       await user.click(screen.getByRole('button', { name: /Wszystkie lekcje/i }))
       
-      expect(screen.getByText('Wszystkie lekcje')).toBeInTheDocument()
+      expect(screen.getAllByText('Wszystkie lekcje')[0]).toBeInTheDocument()
       expect(screen.getByText('Hello World')).toBeInTheDocument()
       expect(screen.getByText(/Python Basics.*python.*10 XP/)).toBeInTheDocument()
     })
@@ -182,13 +183,14 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Select course
       await user.click(screen.getByRole('button', { name: 'Wybierz' }))
       expect(screen.getByText('Moduły w tym kursie:')).toBeInTheDocument()
       
-      // Deselect course
       await user.click(screen.getByRole('button', { name: 'Wybrany' }))
+      
+      
       expect(screen.queryByText('Moduły w tym kursie:')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Wybierz' })).toBeInTheDocument()
     })
 
     it('selects a module within a course', async () => {
@@ -197,13 +199,12 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Select course first
       await user.click(screen.getByRole('button', { name: 'Wybierz' }))
       
-      // Then select module
       await user.click(screen.getByText(/🚀 Getting Started/))
       
-      expect(screen.getByText('Wybrany')).toBeInTheDocument()
+      
+      expect(screen.getAllByText('Wybrany')).toHaveLength(2)
       expect(screen.getByRole('button', { name: 'Dodaj lekcję' })).toBeInTheDocument()
     })
 
@@ -213,15 +214,15 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Go to create course tab
-      await user.click(screen.getByRole('button', { name: /Utwórz kurs/i }))
       
-      // Fill in course form
+      const tabButtons = screen.getAllByRole('button', { name: /Utwórz kurs/i })
+      await user.click(tabButtons[0])
+      
       await user.type(screen.getByPlaceholderText('np. Python dla początkujących'), 'JavaScript Advanced')
       await user.type(screen.getByPlaceholderText('Krótki opis kursu'), 'Advanced JS concepts')
       
-      // Submit
-      await user.click(screen.getByRole('button', { name: 'Utwórz kurs' }))
+      const submitButtons = screen.getAllByRole('button', { name: /Utwórz kurs/i })
+      await user.click(submitButtons[1])
       
       await waitFor(() => {
         expect(mockCreateCourse).toHaveBeenCalledWith(
@@ -253,14 +254,18 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Go to create course tab
-      await user.click(screen.getByRole('button', { name: /Utwórz kurs/i }))
+      const tabButtons = screen.getAllByRole('button', { name: /Utwórz kurs/i })
+      await user.click(tabButtons[0])
       
-      // Create a course
+      await waitFor(() => {
+        expect(screen.getByText('Utwórz nowy kurs i moduły')).toBeInTheDocument()
+      })
+      
       await user.type(screen.getByPlaceholderText('np. Python dla początkujących'), 'New Course')
-      await user.click(screen.getByRole('button', { name: 'Utwórz kurs' }))
       
-      // Should show module form
+      const submitButtons = screen.getAllByRole('button', { name: /Utwórz kurs/i })
+      await user.click(submitButtons[1])
+      
       await waitFor(() => {
         expect(screen.getByText(/Krok 2: Dodaj moduł/)).toBeInTheDocument()
       })
@@ -274,13 +279,10 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Go to lessons tab
       await user.click(screen.getByRole('button', { name: /Wszystkie lekcje/i }))
       
-      // Click edit on a lesson
       await user.click(screen.getByRole('button', { name: 'Edytuj' }))
       
-      // LessonEditDialog should appear (we'd need to mock it properly to test this)
     })
 
     it('shows lesson form with selected module info', async () => {
@@ -289,16 +291,12 @@ describe('AdminPanel', () => {
       
       await waitFor(() => screen.getByText('Python Basics'))
       
-      // Select course
       await user.click(screen.getByRole('button', { name: 'Wybierz' }))
       
-      // Select module
       await user.click(screen.getByText(/🚀 Getting Started/))
       
-      // Go to create lesson tab
       await user.click(screen.getByRole('button', { name: /Utwórz lekcję/i }))
       
-      // Should show selected module info
       expect(screen.getByText('Dodajesz lekcję do:')).toBeInTheDocument()
       expect(screen.getByText(/Getting Started/)).toBeInTheDocument()
     })
@@ -312,11 +310,9 @@ describe('AdminTabs', () => {
     
     await waitFor(() => screen.getByText('Python Basics'))
     
-    // Initially courses tab should be active (has gradient bg)
     const coursesTab = screen.getByRole('button', { name: /^Kursy$/i })
     expect(coursesTab).toHaveClass('bg-gradient-to-r')
     
-    // Click on another tab
     await user.click(screen.getByRole('button', { name: /Wszystkie lekcje/i }))
     
     const lessonsTab = screen.getByRole('button', { name: /Wszystkie lekcje/i })

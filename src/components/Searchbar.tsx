@@ -39,7 +39,7 @@ export default function SearchBar({
 
     const timeoutId = setTimeout(() => {
       handleSearch()
-    }, 300) // 300ms debounce
+    }, 300) 
 
     return () => clearTimeout(timeoutId)
   }, [query])
