@@ -65,9 +65,18 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
   const currentLevelXp = profile.total_xp % 1000
   const progressPercent = (currentLevelXp / xpForNextLevel) * 100
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div 
+      className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="relative bg-indigo-600 p-8 text-white">
           <button
             onClick={onClose}
@@ -113,44 +122,44 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
         </div>
 
         <div className="p-8">
-          <h3 className="text-2xl font-bold text-slate-800 mb-6">Statystyki</h3>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Statystyki</h3>
 
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 p-4 rounded-lg animate-pulse"
+                  className="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg animate-pulse"
                 >
-                  <div className="h-8 bg-slate-200 rounded mb-2"></div>
-                  <div className="h-4 bg-slate-200 rounded"></div>
+                  <div className="h-8 bg-slate-200 dark:bg-slate-600 rounded mb-2"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
                 </div>
               ))}
             </div>
           ) : statistics ? (
             <div className="grid grid-cols-3 gap-4 mb-8 text-center">
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <div className="text-3xl font-bold text-blue-600">
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                   {statistics.total_lessons_completed}
                 </div>
-                <div className="text-sm text-slate-600">Ukończone lekcje</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Ukończone lekcje</div>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="text-3xl font-bold text-green-600">
+              <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-700">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                   {statistics.total_courses_completed}
                 </div>
-                <div className="text-sm text-slate-600">Ukończone kursy</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Ukończone kursy</div>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                <div className="text-3xl font-bold text-purple-600">
+              <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                   {statistics.total_minutes_spent}
                 </div>
-                <div className="text-sm text-slate-600">Minut nauki</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Minut nauki</div>
               </div>
             </div>
           ) : null}
 
-          <h3 className="text-2xl font-bold text-slate-800 mb-6">
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">
             Osiągnięcia
           </h3>
 
@@ -159,10 +168,10 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-100 p-4 rounded-lg animate-pulse"
+                  className="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg animate-pulse"
                 >
-                  <div className="h-6 bg-slate-200 rounded mb-2"></div>
-                  <div className="h-4 bg-slate-200 rounded"></div>
+                  <div className="h-6 bg-slate-200 dark:bg-slate-600 rounded mb-2"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded"></div>
                 </div>
               ))}
             </div>
@@ -171,20 +180,20 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
               {achievements.map((achievement) => (
                 <div
                   key={achievement.id}
-                  className="bg-amber-50 p-4 rounded-lg border-2 border-amber-300 shadow-md hover:shadow-lg transition-shadow"
+                  className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border-2 border-amber-300 dark:border-amber-700 shadow-md hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-start space-x-3">
                     {achievement.icon_url && (
                       <div className="text-3xl">{achievement.icon_url}</div>
                     )}
                     <div className="flex-1">
-                      <h4 className="font-bold text-slate-800">
+                      <h4 className="font-bold text-slate-800 dark:text-white">
                         {achievement.title}
                       </h4>
-                      <p className="text-sm text-slate-600 mt-1">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                         {achievement.description}
                       </p>
-                      <div className="mt-2 text-xs text-amber-600 font-semibold">
+                      <div className="mt-2 text-xs text-amber-600 dark:text-amber-400 font-semibold">
                         +{achievement.xp_reward} XP
                       </div>
                     </div>
@@ -193,7 +202,7 @@ export const UserProfileModal = ({ onClose }: UserProfileModalProps) => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
               <p className="text-lg">Nie masz jeszcze żadnych osiągnięć</p>
               <p className="text-sm mt-2">
                 Kontynuuj naukę, aby odblokować swoje pierwsze osiągnięcie
