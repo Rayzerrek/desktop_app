@@ -83,12 +83,12 @@ export default function CourseGrid({
                     {difficultyLabel(course.difficulty)}
                   </span>
                   {course.estimatedHours && (
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
                       {course.estimatedHours} lekcji.
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-400 dark:text-slate-500">
                   {course.modules?.length ?? 0} modułów
                 </div>
               </div>
