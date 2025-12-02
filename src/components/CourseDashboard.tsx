@@ -54,7 +54,7 @@ export default function CourseDashboard({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl text-slate-600 dark:text-slate-300">Ładowanie kursów...</p>
         </div>
@@ -96,12 +96,12 @@ export default function CourseDashboard({
 
 
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex gap-4 mb-0 bg-white dark:bg-slate-800 rounded-2xl p-2 shadow-lg w-full">
+          <div className="flex gap-4 mb-0 bg-white dark:bg-slate-800 rounded-2xl p-1.5 border border-slate-100 dark:border-slate-700 shadow-lg w-full">
             <button
               onClick={() => setActiveTab('main')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 text-lg ${
+              className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 text-lg ${
                 activeTab === 'main'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
@@ -109,9 +109,9 @@ export default function CourseDashboard({
             </button>
             <button
               onClick={() => setActiveTab('all')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-300 text-lg ${
+              className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-200 text-lg ${
                 activeTab === 'all'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
@@ -177,7 +177,7 @@ export default function CourseDashboard({
               return progress > 0 && progress < 100
             }).length === 0 && (
               <div className="text-center py-12">
-                <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700 p-10 max-w-2xl mx-auto">
+                <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 p-10 max-w-2xl mx-auto shadow-xl">
                   <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
                     Rozpocznij swoją przygodę
                   </h3>
@@ -190,11 +190,7 @@ export default function CourseDashboard({
 
             <div className="mt-16 text-center">
               <div
-                className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700 p-10 max-w-2xl mx-auto"
-                style={{
-                  boxShadow:
-                    '0 12px 48px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)',
-                }}
+                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 p-10 max-w-2xl mx-auto shadow-xl"
               >
                 <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
                   Nie wiesz od czego zacząć?
@@ -205,7 +201,7 @@ export default function CourseDashboard({
                 </p>
                 <button
                   onClick={() => onCourseSelect('course-python')}
-                  className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-10 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Zacznij od Pythona
                 </button>
@@ -214,8 +210,7 @@ export default function CourseDashboard({
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <div
-                className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-100 dark:border-slate-700"
-                style={{ boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)' }}
+                className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-100 dark:border-slate-700 shadow-lg"
               >
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-lg">
                   Nauka przez praktykę
@@ -225,8 +220,7 @@ export default function CourseDashboard({
                 </p>
               </div>
               <div
-                className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-100 dark:border-slate-700"
-                style={{ boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)' }}
+                className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-100 dark:border-slate-700 shadow-lg"
               >
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-lg">
                   System XP i osiągnięć
@@ -236,8 +230,7 @@ export default function CourseDashboard({
                 </p>
               </div>
               <div
-                className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg border border-slate-100 dark:border-slate-700"
-                style={{ boxShadow: '0 6px 24px rgba(0, 0, 0, 0.06)' }}
+                className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-100 dark:border-slate-700 shadow-lg"
               >
                 <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-lg">
                   Utrzymuj streak
@@ -250,7 +243,7 @@ export default function CourseDashboard({
           </div>
         ) : (
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
+            <h2 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-6">
               Wszystkie dostępne kursy
             </h2>
             <CourseGrid

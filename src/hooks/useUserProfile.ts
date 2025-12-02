@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { UserProfile, userProfileService } from '../services/UserProfileService'
 import { useAuth } from './useAuth'
-import { progressService } from '../services/ProgressService'
 
 export function useUserProfile() {
   const { isAuthenticated } = useAuth()
@@ -21,11 +20,7 @@ export function useUserProfile() {
 
         try {
           setLoading(true)
-          const [userProfile, userProgress] = await Promise.all([
-            userProfileService.getUserProfile(userId),
-            progressService.getUserProgress(userId),
-          ])
-
+          const userProfile = await userProfileService.getUserProfile(userId)
 
           setProfile({
             ...userProfile,

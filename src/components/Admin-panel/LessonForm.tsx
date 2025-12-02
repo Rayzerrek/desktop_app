@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Course, Module } from '../../types/lesson'
+import { Course, Module, QuizOption } from '../../types/lesson'
 
 type LessonLanguage = 'python' | 'javascript' | 'html' | 'css' | 'typescript'
 type LessonType = 'exercise' | 'theory' | 'quiz' | 'project'
@@ -17,6 +17,10 @@ interface NewLessonData {
   expectedOutput: string
   exampleCode: string
   exampleDescription: string
+  // Quiz fields
+  quizQuestion?: string
+  quizOptions?: QuizOption[]
+  quizExplanation?: string
 }
 
 interface LessonFormProps {
@@ -39,6 +43,9 @@ const initialLessonState: NewLessonData = {
   expectedOutput: '',
   exampleCode: '',
   exampleDescription: '',
+  quizQuestion: '',
+  quizOptions: [],
+  quizExplanation: '',
 }
 
 export default function LessonForm({
@@ -325,9 +332,134 @@ export default function LessonForm({
               </div>
             </div>
           </>
-        )}
+          )}
 
-        {/* Action buttons */}
+          {/* Quiz-specific fields */}
+          {newLesson.lessonType === 'quiz' && (
+          <>
+           <div>
+             <label className="block text-sm font-medium text-slate-700 mb-2">
+               Pytanie *
+             </label>
+             <textarea
+               value={newLesson.quizQuestion || ''}
+               onChange={(e) =>
+                 setNewLesson({ ...newLesson, quizQuestion: e.target.value })
+               }
+               required
+               rows={2}
+               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+               placeholder="Wpisz pytanie quizowe..."
+             />
+           </div>
+
+           <div>
+             <label className="block text-sm font-medium text-slate-700 mb-2">
+               Opcje odpowiedzi *
+             </label>
+             <div className="space-y-3">
+               {newLesson.quizOptions?.map((option, idx) => (
+                 <div key={idx} className="flex gap-3 items-start">
+                   <div className="flex-1 space-y-2">
+                     <input
+                       type="text"
+                       value={option.text}
+                       onChange={(e) => {
+                         const newOptions = [...(newLesson.quizOptions || [])]
+                         newOptions[idx] = { ...newOptions[idx], text: e.target.value }
+                         setNewLesson({ ...newLesson, quizOptions: newOptions })
+                       }}
+                       className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none text-sm"
+                       placeholder="Tekst odpowiedzi"
+                       required
+                     />
+                     {option.explanation && (
+                       <input
+                         type="text"
+                         value={option.explanation}
+                         onChange={(e) => {
+                           const newOptions = [...(newLesson.quizOptions || [])]
+                           newOptions[idx] = {
+                             ...newOptions[idx],
+                             explanation: e.target.value,
+                           }
+                           setNewLesson({ ...newLesson, quizOptions: newOptions })
+                         }}
+                         className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none text-sm"
+                         placeholder="Wyjaśnienie (opcjonalne)"
+                       />
+                     )}
+                   </div>
+                   <div className="flex items-center gap-2 pt-2">
+                     <label className="flex items-center gap-2 cursor-pointer">
+                       <input
+                         type="checkbox"
+                         checked={option.isCorrect}
+                         onChange={(e) => {
+                           const newOptions = [...(newLesson.quizOptions || [])]
+                           newOptions[idx] = {
+                             ...newOptions[idx],
+                             isCorrect: e.target.checked,
+                           }
+                           setNewLesson({ ...newLesson, quizOptions: newOptions })
+                         }}
+                         className="w-4 h-4 text-green-600 border-slate-300 rounded focus:ring-green-500"
+                       />
+                       <span className="text-xs font-medium text-slate-600">
+                         Poprawna
+                       </span>
+                     </label>
+                     <button
+                       type="button"
+                       onClick={() => {
+                         const newOptions = (newLesson.quizOptions || []).filter(
+                           (_, i) => i !== idx
+                         )
+                         setNewLesson({ ...newLesson, quizOptions: newOptions })
+                       }}
+                       className="px-2 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-medium"
+                     >
+                       Usuń
+                     </button>
+                   </div>
+                 </div>
+               ))}
+             </div>
+             <button
+               type="button"
+               onClick={() => {
+                 setNewLesson({
+                   ...newLesson,
+                   quizOptions: [
+                     ...(newLesson.quizOptions || []),
+                     { text: '', isCorrect: false, explanation: '' },
+                   ],
+                 })
+               }}
+               className="mt-3 px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition text-sm"
+             >
+               + Dodaj opcję
+             </button>
+           </div>
+
+           <div>
+             <label className="block text-sm font-medium text-slate-700 mb-2">
+               Ogólne wyjaśnienie (opcjonalne)
+             </label>
+             <textarea
+               value={newLesson.quizExplanation || ''}
+               onChange={(e) =>
+                 setNewLesson({ ...newLesson, quizExplanation: e.target.value })
+               }
+               rows={2}
+               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+               placeholder="Wyjaśnienie pokazane po odpowiedzeniu..."
+             />
+           </div>
+          </>
+          )}
+
+          {/* Action buttons */}
         <div className="flex gap-4 pt-6 border-t border-slate-200">
           <button
             type="submit"

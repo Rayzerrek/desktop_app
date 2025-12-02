@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
@@ -23,6 +23,10 @@ export default function AuthPanel({ onLoginSuccess }: AuthPanelProps) {
     message: string
     type: ToastType
   } | null>(null)
+
+
+  const theme = localStorage.getItem('theme') || 'system';
+  document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
 
   const handleGoogleLogin = async () => {
     setLoading(true)

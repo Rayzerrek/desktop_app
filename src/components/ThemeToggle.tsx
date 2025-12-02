@@ -9,7 +9,6 @@ function getInitialTheme(): Theme {
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
-    // Sprawdź preferencje systemowe
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }

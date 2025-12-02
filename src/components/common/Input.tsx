@@ -1,5 +1,5 @@
 const inputStyle =
-  'w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-0 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-500'
+  'w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-0 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-500'
 const labelStyle = 'block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2'
 interface InputProps {
   label: string

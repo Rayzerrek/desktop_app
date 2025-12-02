@@ -1,5 +1,5 @@
 import Editor from '@monaco-editor/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { getFileNameForLanguage } from '../utils/courseUtils'
 
 interface CodeEditorProps {

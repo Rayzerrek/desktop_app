@@ -86,9 +86,9 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-slate-600">Ładowanie kursów...</p>
+          <p className="text-xl text-muted dark:text-muted-dark">Ładowanie kursów...</p>
         </div>
       </div>
     )
@@ -98,10 +98,10 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
   const recommendedCourses = getRecommendedCourses()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-background dark:bg-background-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-6xl font-bold text-slate-900 mb-4 tracking-tight">
+          <h1 className="text-6xl font-bold text-foreground dark:text-foreground-dark mb-4 tracking-tight">
             Twoje Kursy
           </h1>
           <div className="flex justify-center mb-6">
@@ -113,13 +113,13 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
           </div>
         </div>
 
-        <div className="flex gap-4 mb-8 bg-white rounded-2xl p-2 shadow-lg w-full">
+        <div className="flex gap-4 mb-8 bg-card dark:bg-card-dark rounded-xl p-1 border border-border dark:border-border-dark w-full">
           <Button
             onClick={() => setActiveTab('overview')}
             variant={activeTab === 'overview' ? 'primary' : 'secondary'}
             size="lg"
             fullWidth
-            className={activeTab === 'overview' ? '' : '!bg-transparent !text-slate-600 hover:!text-slate-800 hover:!bg-slate-50 !shadow-none'}
+            className={activeTab === 'overview' ? '' : '!bg-transparent !text-muted dark:!text-muted-dark hover:!text-foreground dark:hover:!text-foreground-dark hover:!bg-background dark:hover:!bg-background-dark !shadow-none !border-none'}
           >
             Przegląd
           </Button>
@@ -128,7 +128,7 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
             variant={activeTab === 'all' ? 'primary' : 'secondary'}
             size="lg"
             fullWidth
-            className={activeTab === 'all' ? '' : '!bg-transparent !text-slate-600 hover:!text-slate-800 hover:!bg-slate-50 !shadow-none'}
+            className={activeTab === 'all' ? '' : '!bg-transparent !text-muted dark:!text-muted-dark hover:!text-foreground dark:hover:!text-foreground-dark hover:!bg-background dark:hover:!bg-background-dark !shadow-none !border-none'}
           >
             Wszystkie kursy
           </Button>
@@ -138,7 +138,7 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
           <div className="space-y-12">
             {startedCourses.length > 0 && (
               <section>
-                <h2 className="text-3xl font-bold text-slate-900 mb-6">
+                <h2 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-6">
                   Kontynuuj naukę
                 </h2>
                 <CourseGrid
@@ -150,7 +150,7 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
             )}
 
             <section>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">
+              <h2 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-6">
                 Polecane dla Ciebie
               </h2>
               <CourseGrid
@@ -162,11 +162,11 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
 
             {startedCourses.length === 0 && (
               <div className="text-center py-12">
-                <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-10 max-w-2xl mx-auto">
-                  <h3 className="text-3xl font-bold text-slate-900 mb-4">
+                <div className="bg-card dark:bg-card-dark rounded-xl border border-border dark:border-border-dark p-10 max-w-2xl mx-auto">
+                  <h3 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-4">
                     Rozpocznij swoją przygodę
                   </h3>
-                  <p className="text-slate-600 mb-6 text-lg leading-relaxed">
+                  <p className="text-muted dark:text-muted-dark mb-6 text-lg leading-relaxed">
                     Wybierz jeden z polecanych kursów i zacznij naukę już teraz
                   </p>
                 </div>
@@ -175,7 +175,7 @@ export default function CourseTabs({ onCourseSelect }: CourseTabsProps) {
           </div>
         ) : (
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-6">
               Wszystkie dostępne kursy
             </h2>
             <CourseGrid

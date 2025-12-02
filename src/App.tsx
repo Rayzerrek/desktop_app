@@ -88,9 +88,9 @@ function AppContent() {
       })
       setTimeout(() => navigate('/dashboard'), 1000)
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="min-h-screen flex items-center justify-center bg-background dark:bg-background-dark">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Brak dostępu</h1>
+            <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">Brak dostępu</h1>
           </div>
         </div>
       )
@@ -285,9 +285,9 @@ function CourseRedirect() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-slate-600 dark:text-slate-300">Ładowanie kursu...</p>
+          <p className="text-xl text-muted dark:text-muted-dark">Ładowanie kursu...</p>
         </div>
       </div>
     )

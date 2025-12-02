@@ -42,7 +42,7 @@ export default function CourseGrid({
         return (
           <div
             key={course.id}
-            className="bg-white dark:bg-slate-800 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-200 border border-slate-100 dark:border-slate-700 overflow-hidden cursor-pointer"
+            className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl"
             onClick={() => onCourseSelect(course.id)}
             role="button"
             tabIndex={0}
@@ -54,7 +54,7 @@ export default function CourseGrid({
               <div className="flex items-start gap-4">
                 <div
                   className="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center text-xl font-bold text-white"
-                  style={{ background: course.color || '#4f46e5' }}
+                  style={{ background: course.color || '#0070F3' }}
                 >
                   {course.iconUrl ? (
                     <img
@@ -71,24 +71,24 @@ export default function CourseGrid({
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                     {course.title}
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
                     {course.description}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+              <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300">
                     {difficultyLabel(course.difficulty)}
                   </span>
                   {course.estimatedHours && (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       {course.estimatedHours} lekcji.
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-slate-400 dark:text-slate-500">
+                <div className="text-xs text-slate-500 dark:text-slate-400">
                   {course.modules?.length ?? 0} modułów
                 </div>
               </div>
@@ -96,7 +96,7 @@ export default function CourseGrid({
               <div className="mt-4">
                 <div className="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                   <div
-                    className={`h-2 bg-gradient-to-r from-blue-500 to-indigo-600`}
+                    className={`h-full bg-gradient-to-r from-purple-500 to-indigo-500`}
                     style={{ width: `${progress}%` }}
                     aria-valuenow={progress}
                     aria-valuemin={0}

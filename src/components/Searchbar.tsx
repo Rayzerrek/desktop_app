@@ -30,6 +30,9 @@ export default function SearchBar({
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+
+  
+
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([])
@@ -130,9 +133,8 @@ export default function SearchBar({
 
   return (
     <div ref={searchRef} className={`relative w-full max-w-2xl ${className}`}>
-      {/* Search Input - Material 3 Style */}
       <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 group-focus-within:text-purple-600 dark:group-focus-within:text-purple-400 transition-colors">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500  transition-colors">
           {isLoading ? (
             <FiLoader className="w-5 h-5 animate-spin text-purple-600 dark:text-purple-400" />
           ) : (
@@ -151,19 +153,14 @@ export default function SearchBar({
           }}
           placeholder={placeholder}
           className="w-full pl-12 pr-12 py-4 bg-surface-container rounded-full
-                             text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400
+                             text-slate-900 placeholder-slate-500 dark:placeholder-slate-600
                              focus:outline-none focus:ring-0
                              transition-all duration-300 ease-out
                              shadow-md hover:shadow-lg focus:shadow-xl
-<<<<<<< HEAD
-                             border border-transparent focus:border-purple-300 dark:bg-slate-700"
+                             border border-transparent"
           style={{
-            backgroundColor: '#F3F4F6',
+            backgroundColor: '#f2f3f5',
           }}
-=======
-                             border border-transparent focus:border-purple-300 dark:focus:border-purple-500
-                             dark:bg-slate-700"
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
         />
 
         {query && (
@@ -179,7 +176,6 @@ export default function SearchBar({
         )}
       </div>
 
-      {/* Search Results - Material 3 Elevated Surface */}
       {isOpen && results.length > 0 && (
         <div
           className="absolute z-50 w-full mt-3 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden 
@@ -199,11 +195,7 @@ export default function SearchBar({
                                           border-b border-slate-50 dark:border-slate-700 last:border-b-0
                                           ${
                                             selectedIndex === index
-<<<<<<< HEAD
                                               ? 'bg-purple-50/70 dark:bg-slate-700/70 backdrop-blur-sm'
-=======
-                                              ? 'bg-purple-50/70 dark:bg-purple-900/30 backdrop-blur-sm'
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
                                               : 'hover:bg-slate-50/80 dark:hover:bg-slate-700/80'
                                           }`}
               >
@@ -217,13 +209,8 @@ export default function SearchBar({
                                                        ${
                                                          result.type ===
                                                          'course'
-<<<<<<< HEAD
                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
                                                            : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-=======
-                                                           ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300'
-                                                           : 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300'
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
                                                        }`}
                     >
                       {result.type === 'course' ? 'Kurs' : 'Lekcja'}
@@ -235,19 +222,11 @@ export default function SearchBar({
                     </p>
                   )}
                   {result.courseName && (
-<<<<<<< HEAD
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
                       <span className="font-medium">{result.courseName}</span>
                       {result.moduleName && (
                         <>
                           <span className="text-slate-400 dark:text-slate-500">•</span>
-=======
-                    <p className="text-xs text-slate-500 dark:text-slate-500 mt-2 flex items-center gap-1">
-                      <span className="font-medium">{result.courseName}</span>
-                      {result.moduleName && (
-                        <>
-                          <span className="text-slate-400 dark:text-slate-600">•</span>
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
                           <span>{result.moduleName}</span>
                         </>
                       )}
@@ -259,30 +238,18 @@ export default function SearchBar({
           </div>
 
           <div
-<<<<<<< HEAD
             className="px-5 py-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm border-t border-slate-100 dark:border-slate-700
-=======
-            className="px-5 py-3 bg-slate-50/80 dark:bg-slate-700/80 backdrop-blur-sm border-t border-slate-100 dark:border-slate-600
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
                                   text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between"
           >
             <span className="font-medium">
               Znaleziono {results.length} wyników
             </span>
             <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
-<<<<<<< HEAD
               <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-medium shadow-sm">
                 ↑↓
               </kbd>
               <span>nawigacja</span>
               <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-medium shadow-sm">
-=======
-              <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-xs font-medium shadow-sm">
-                ↑↓
-              </kbd>
-              <span>nawigacja</span>
-              <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg text-xs font-medium shadow-sm">
->>>>>>> 7bfd78c4dce8992a0e518425432bae819e54d395
                 Enter
               </kbd>
               <span>wybierz</span>
@@ -291,7 +258,6 @@ export default function SearchBar({
         </div>
       )}
 
-      {/* No Results - Material 3 */}
       {isOpen && !isLoading && query.length >= 2 && results.length === 0 && (
         <div
           className="absolute z-50 w-full mt-3 bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 text-center border border-slate-100 dark:border-slate-700"
