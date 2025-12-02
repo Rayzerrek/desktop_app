@@ -25,15 +25,14 @@ export default function LessonDemo({
   onNextLesson,
 }: LessonDemoProps) {
   const [output, setOutput] = useState<string>('')
-  const [currentCode, setCurrentCode] = useState<string>('') 
+  const [currentCode, setCurrentCode] = useState<string>('')
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [course, setCourse] = useState<Course | null>(null)
-  const [loading, setLoading] = useState(true)
-
-
-
+  const [loading, setLoading] = useState<boolean>(true)
+  const [htmlPreview, setHtmlPreview] = useState<string>('');
+  
 
   useEffect(() => {
     loadLesson()
@@ -99,17 +98,7 @@ export default function LessonDemo({
   const handleRunCode = async (code: string) => {
     try {
       if (lesson.language === 'html') {
-        if (code.includes(expectedOutput)) {
-          setOutput(expectedOutput)
-          setIsCorrect(true)
-          setTimeout(() => {
-            setShowSuccessModal(true)
-          }, 500)
-        } else {
-          setOutput('Error: Expected output not found in HTML')
-          setIsCorrect(false)
-        }
-        return
+        setHtmlPreview(code)
       }
 
       const result = await invoke<CodeValidationResponse>('validate_code', {
@@ -164,6 +153,7 @@ export default function LessonDemo({
   }
 
   return (
+
     <>
       <LessonSuccessModal
         isOpen={showSuccessModal}
@@ -252,7 +242,7 @@ export default function LessonDemo({
               )}
 
               <div
-                className="flex items-center justify-between bg-gradient-to-r from-amber-50 to-yellow-50 
+                className="flex items-center justify-between bg-gradient-to-r from-amber-50 to-yellow-50
                                    rounded-2xl p-5 shadow-md border border-amber-200"
               >
                 <span className="text-amber-900 font-semibold">
@@ -280,6 +270,33 @@ export default function LessonDemo({
                   height="300px"
                   theme="vs-dark"
                 />
+                {
+                  lesson.language === 'html' && (
+                    <div className="border-t border-slate-100">
+                      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-3 flex items-center gap-2">
+                        <span className="text-slate-300 text-sm font-medium">
+                          Podgląd HTML
+                        </span>
+                      </div>
+                      <div className="p-4 bg-slate-50 min-h-[200px]">
+                        {htmlPreview ? (
+                          <iframe
+                            title="HTML Preview"
+                            srcDoc={htmlPreview}
+                            className="w-full h-64 border border-slate-200 rounded-lg"
+                          ></iframe>
+                        ) : (
+                          <div className="text-slate-500 italic flex items-center gap-2">
+                            <span className="animate-pulse">▶</span>
+                            <span className="font-sans text-base">
+                              Uruchom kod aby zobaczyć podgląd...
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                }
               </div>
 
               <div
@@ -315,7 +332,7 @@ export default function LessonDemo({
 
               {isCorrect === false && (
                 <div
-                  className="rounded-3xl p-6 bg-gradient-to-br from-red-50 to-pink-50 
+                  className="rounded-3xl p-6 bg-gradient-to-br from-red-50 to-pink-50
                                       border-2 border-red-300 shadow-lg"
                   style={{
                     boxShadow: '0 8px 24px rgba(239, 68, 68, 0.15)',

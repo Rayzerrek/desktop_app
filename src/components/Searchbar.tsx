@@ -151,11 +151,11 @@ export default function SearchBar({
           }}
           placeholder={placeholder}
           className="w-full pl-12 pr-12 py-4 bg-surface-container rounded-full
-                             text-slate-900 placeholder-slate-500
+                             text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400
                              focus:outline-none focus:ring-0
                              transition-all duration-300 ease-out
                              shadow-md hover:shadow-lg focus:shadow-xl
-                             border border-transparent focus:border-purple-300"
+                             border border-transparent focus:border-purple-300 dark:bg-slate-700"
           style={{
             backgroundColor: '#F3F4F6',
           }}
@@ -164,8 +164,8 @@ export default function SearchBar({
         {query && (
           <button
             onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 
-                                 hover:text-slate-700 hover:bg-slate-200 rounded-full p-1
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400
+                                 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-full p-1
                                  transition-all duration-200"
             aria-label="Clear search"
           >
@@ -177,8 +177,8 @@ export default function SearchBar({
       {/* Search Results - Material 3 Elevated Surface */}
       {isOpen && results.length > 0 && (
         <div
-          className="absolute z-50 w-full mt-3 bg-white rounded-3xl shadow-2xl overflow-hidden 
-                              animate-slide-down border border-slate-100"
+          className="absolute z-50 w-full mt-3 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden 
+                              animate-slide-down border border-slate-100 dark:border-slate-700"
           style={{
             boxShadow:
               '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
@@ -191,16 +191,16 @@ export default function SearchBar({
                 onClick={() => handleResultClick(result)}
                 className={`w-full px-5 py-4 flex items-start gap-3 text-left 
                                           transition-all duration-200
-                                          border-b border-slate-50 last:border-b-0
+                                          border-b border-slate-50 dark:border-slate-700 last:border-b-0
                                           ${
                                             selectedIndex === index
-                                              ? 'bg-purple-50/70 backdrop-blur-sm'
-                                              : 'hover:bg-slate-50/80'
+                                              ? 'bg-purple-50/70 dark:bg-slate-700/70 backdrop-blur-sm'
+                                              : 'hover:bg-slate-50/80 dark:hover:bg-slate-700/80'
                                           }`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold text-slate-900 truncate">
+                    <h4 className="font-semibold text-slate-900 dark:text-white truncate">
                       {result.title}
                     </h4>
                     <span
@@ -208,24 +208,24 @@ export default function SearchBar({
                                                        ${
                                                          result.type ===
                                                          'course'
-                                                           ? 'bg-blue-100 text-blue-800'
-                                                           : 'bg-green-100 text-green-800'
+                                                           ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                           : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                                                        }`}
                     >
                       {result.type === 'course' ? 'Kurs' : 'Lekcja'}
                     </span>
                   </div>
                   {result.description && (
-                    <p className="text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
                       {result.description}
                     </p>
                   )}
                   {result.courseName && (
-                    <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
                       <span className="font-medium">{result.courseName}</span>
                       {result.moduleName && (
                         <>
-                          <span className="text-slate-400">•</span>
+                          <span className="text-slate-400 dark:text-slate-500">•</span>
                           <span>{result.moduleName}</span>
                         </>
                       )}
@@ -237,18 +237,18 @@ export default function SearchBar({
           </div>
 
           <div
-            className="px-5 py-3 bg-slate-50/80 backdrop-blur-sm border-t border-slate-100 
-                                  text-xs text-slate-600 flex items-center justify-between"
+            className="px-5 py-3 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm border-t border-slate-100 dark:border-slate-700
+                                  text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between"
           >
             <span className="font-medium">
               Znaleziono {results.length} wyników
             </span>
-            <span className="text-slate-500 flex items-center gap-2">
-              <kbd className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium shadow-sm">
+            <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+              <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-medium shadow-sm">
                 ↑↓
               </kbd>
               <span>nawigacja</span>
-              <kbd className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium shadow-sm">
+              <kbd className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg text-xs font-medium shadow-sm">
                 Enter
               </kbd>
               <span>wybierz</span>
@@ -260,14 +260,14 @@ export default function SearchBar({
       {/* No Results - Material 3 */}
       {isOpen && !isLoading && query.length >= 2 && results.length === 0 && (
         <div
-          className="absolute z-50 w-full mt-3 bg-white rounded-3xl shadow-xl p-8 text-center border border-slate-100"
+          className="absolute z-50 w-full mt-3 bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 text-center border border-slate-100 dark:border-slate-700"
           style={{
             boxShadow:
               '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
           }}
         >
-          <p className="text-slate-800 font-semibold text-lg">Brak wyników</p>
-          <p className="text-sm text-slate-500 mt-2">
+          <p className="text-slate-800 dark:text-white font-semibold text-lg">Brak wyników</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
             Spróbuj użyć innych słów kluczowych
           </p>
         </div>

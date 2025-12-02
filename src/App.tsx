@@ -88,9 +88,9 @@ function AppContent() {
       })
       setTimeout(() => navigate('/dashboard'), 1000)
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-slate-800">Brak dostępu</h1>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Brak dostępu</h1>
           </div>
         </div>
       )
@@ -139,8 +139,10 @@ function AppContent() {
             <ProtectedRoute>
               <div>
                 <div className="fixed top-4 right-4 z-50">
-                  <ThemeToggle />
-                  <UserProfileDropdown />
+                  <div className="flex items-center gap-4">
+                    <ThemeToggle />
+                    <UserProfileDropdown />
+                  </div>
                 </div>
 
                 <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
@@ -283,9 +285,9 @@ function CourseRedirect() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-slate-600">Ładowanie kursu...</p>
+          <p className="text-xl text-slate-600 dark:text-slate-300">Ładowanie kursu...</p>
         </div>
       </div>
     )
