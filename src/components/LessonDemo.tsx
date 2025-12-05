@@ -179,7 +179,7 @@ export default function LessonDemo({
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-3">
               <span className="font-medium">{course?.title || 'Kurs'}</span>
-              <span className="text-slate-400 dark:text-slate-500">›</span>
+              <span className="text-slate-400 dark:text-slate-500">{String.fromCharCode(8250)}</span>
               <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full text-xs font-semibold">
                 Lekcja {lesson.orderIndex}
               </span>
@@ -306,7 +306,7 @@ export default function LessonDemo({
               >
                 <div className="bg-slate-50 dark:bg-slate-900 px-6 py-3 flex items-center gap-2">
                   <span className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-                    💻 Konsola
+                    Konsola
                   </span>
                 </div>
                 <div className="bg-slate-900 p-6 min-h-[120px] font-mono text-lg">
@@ -333,7 +333,7 @@ export default function LessonDemo({
                 >
                   <div className="mb-3">
                     <h3 className="text-2xl font-bold text-red-600 dark:text-red-400">
-                      ❌ Nie do końca...
+                      Nie do końca...
                     </h3>
                   </div>
                   <p className="text-red-600 dark:text-red-300 leading-relaxed mb-4">

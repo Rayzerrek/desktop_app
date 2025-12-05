@@ -243,7 +243,7 @@ export default function CourseDashboard({
           </div>
         ) : (
           <div>
-            <h2 className="text-3xl font-bold text-foreground dark:text-foreground-dark mb-6">
+            <h2 className="text-3xl text-black font-bold text-foreground dark:text-white dark:text-foreground-dark mb-6">
               Wszystkie dostępne kursy
             </h2>
             <CourseGrid

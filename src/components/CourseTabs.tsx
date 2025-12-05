@@ -4,7 +4,7 @@ import { lessonService } from '../services/LessonService'
 import { progressService, UserProgress } from '../services/ProgressService'
 import CourseGrid from './CourseGrid'
 import SearchBar from './Searchbar'
-import Button from './ui/Button'
+import Button from './common/Button'
 
 interface CourseTabsProps {
   onCourseSelect: (courseId: string) => void
